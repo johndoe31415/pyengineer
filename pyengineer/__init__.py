@@ -20,3 +20,4 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from .UnitValue import UnitValue
+from .ESeries import ESeries

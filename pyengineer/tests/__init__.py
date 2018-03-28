@@ -20,3 +20,4 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from .UnitValueTests import UnitValueTests
+from .ESeriesTests import ESeriesTests
