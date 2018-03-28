@@ -23,14 +23,14 @@ import collections
 
 from pyengineer.Exceptions import InvalidThreadDefinitionException
 
-def pitch_turn_per_inch(x):
-	return 0.0254 / x
-
 class Thread(object):
-	def __init__(self, diameter, pitch, usage = None, group = None):
+	def __init__(self, diameter, pitch, group = None, name = None, usage = None):
 		"""Diameter is given in meters, pitch given in meters/turn."""
 		self._diameter = diameter
 		self._pitch = pitch
+		self._group = group
+		self._name = name
+		self._usage = usage
 
 	@property
 	def diameter(self):
@@ -41,12 +41,20 @@ class Thread(object):
 		return self._pitch
 
 	@property
-	def usage(self):
-		return self._usage
+	def pitch_tpi(self):
+		return 0.0254 / self.pitch
 
 	@property
 	def group(self):
 		return self._group
+
+	@property
+	def name(self):
+		return self._name
+
+	@property
+	def usage(self):
+		return self._usage
 
 	def _diffval(x, y):
 		diff = abs(x / y)
@@ -59,18 +67,18 @@ class Thread(object):
 		return diff
 
 	def diff(self, other):
-		ddiff = Thread._diffval(self._d, other._d)
+		ddiff = Thread._diffval(self.diameter, other.diameter)
 		if ddiff < 0:
 			ddiff = 2 * abs(ddiff)
 		else:
 			ddiff = abs(ddiff)
-		pdiff = abs(Thread._diffval(self._s, other._s) * 2)
+		pdiff = abs(Thread._diffval(self.pitch, other.pitch) * 2)
 		sumdiff = ddiff + pdiff
 #		print("%-30s %-30s %.4f %.4f %.4f" % (str(self), str(other), ddiff, pdiff, sumdiff))
 		return sumdiff
 
 	def __str__(self):
-		return "d=%.1f p=%.1f" % (self.diameter, self.pitch)
+		return "%s / %s (d=%.1fmm p=%.0f µm/turn=%.1f TPI)" % (self.group, self.name, self.diameter * 1000, self.pitch * 1e6, self.pitch_tpi)
 
 class ThreadDB(object):
 	_DIAMETER_ELEMENTS = set(("diameter", "diameter_thou", "diameter_inch"))
@@ -79,7 +87,7 @@ class ThreadDB(object):
 	def __init__(self):
 		self._threads_by_group = collections.defaultdict(list)
 
-	def add(self, thread):
+	def add_thread(self, thread):
 		group = thread.group or "Misc"
 		self._threads_by_group[group].append(thread)
 
@@ -94,22 +102,42 @@ class ThreadDB(object):
 		pitch_elements = self._PITCH_ELEMENTS & thread_data.keys()
 		if len(pitch_elements) != 1:
 			raise InvalidThreadDefinitionException("Expected exactly one pitch element in thread definition, but got %d (%s): %s" % (len(pitch_elements), ", ".join(sorted(pitch_elements)), str(thread_data)))
-#		print(diameter_elements)
-#		print(thread_data)
+
+
+		if "diameter" in thread_data:
+			diameter = thread_data["diameter"]
+		elif "diameter_thou" in thread_data:
+			diameter = thread_data["diameter_thou"] * 25.4 / 1000 / 1000
+		elif "diameter_inch" in thread_data:
+			if len(thread_data["diameter_inch"]) not in [ 2, 3 ]:
+				raise InvalidThreadDefinitionException("Expected two or three array members for diameter_inch definition, but got %d: %s" % (len(thread_data["diameter_inch"]), str(thread_data)))
+			if len(thread_data["diameter_inch"]) == 2:
+				diameter = (thread_data["diameter_inch"][0] / thread_data["diameter_inch"][1]) * 25.4 / 1000
+			else:
+				diameter = (thread_data["diameter_inch"][0] + (thread_data["diameter_inch"][1] / thread_data["diameter_inch"][2])) * 25.4 / 1000
+
+		if "pitch" in thread_data:
+			pitch = thread_data["pitch"]
+		elif "tpi" in thread_data:
+			pitch = 0.0254 / thread_data["tpi"]
+
+		thread = Thread(diameter = diameter, pitch = pitch, group = group_name, name = thread_data["name"], usage = thread_data.get("usage"))
+		self.add_thread(thread)
 
 	def add_groups_by_definition(self, thread_groups):
 		for (group_name, threads_data) in thread_groups.items():
 			for thread_data in threads_data:
 				self.add_by_definition(group_name, thread_data)
 
-	def closest(refthread, closestn = 5):
-		diffs = [ ]
-		for (threadclass, threads) in ThreadValues._threaddb.items():
-			for (threadname, thread) in threads.items():
-				diff = thread.diff(refthread)
-#				print(threadname, thread, diff)
-				diffs.append((diff, threadclass, threadname, thread))
-		diffs.sort()
-		return diffs[:closestn]
+	def closest(self, reference, closest_n = 5):
+		candidates = [ ]
+		for thread in self:
+			error = thread.diff(reference)
+			candidates.append((error, thread))
+		candidates.sort(key = lambda x: x[0])
+		for ((error, candidate), _) in zip(candidates, range(closest_n)):
+			yield candidate
 
-
+	def __iter__(self):
+		for (group_name, threads_data) in self._threads_by_group.items():
+			yield from threads_data

@@ -31,7 +31,10 @@ class ThreadsTests(unittest.TestCase):
 		self.assertAlmostEqual(thread.pitch, 0.25)
 
 	def test_db(self):
-		database_data = json.loads(pkgutil.get_data("pyengineer.data", "threads.json"))
+		database_data = json.loads(pkgutil.get_data("pyengineer.data", "threads.json").decode("utf-8"))
 		db = ThreadDB()
 		db.add_groups_by_definition(database_data)
-		print(db)
+
+		reference = Thread(diameter = 0.003, pitch = 500e-6)
+		closest = list(db.closest(reference))
+		self.assertEqual(closest[0].name, "M3")
