@@ -19,33 +19,9 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import os
-from flask import Flask
-from mako.lookup import TemplateLookup
+import json
 
-class GUIApplication(object):
-	def __init__(self, config):
-		self._config = config
-		print(__file__)
-		template_dir = os.path.dirname(__file__) + "/templates"
-		self._lookup = TemplateLookup([ template_dir ], input_encoding = "utf-8")
-		self._app = Flask(__name__)
-		self._app.add_url_rule("/", "index", self._serve_index)
-
-	def _serve(self, template_name):
-		template = self._lookup.get_template(template_name)
-		result = template.render()
-		return result
-
-	def _serve_index(self):
-		return self._serve("index.html")
-
-	@property
-	def app(self):
-		return self._app
-
-#app = Flask(__name__)
-#ctrlr = GUIApplicationController(app)
-#@app.route("/")
-#def index():
-#	return "Hello, World!"
+class Configuration(object):
+	def __init__(self, json_filename):
+		with open(json_filename, "r") as f:
+			self._raw_config = json.loads(f.read())
