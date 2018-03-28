@@ -25,3 +25,4 @@ from .Threads import Thread, ThreadDB
 from .Exceptions import GeneralException
 from .Configuration import Configuration
 from .GUIApplication import GUIApplication
+from .BasePlugin import BasePlugin

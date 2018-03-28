@@ -25,3 +25,6 @@ class Configuration(object):
 	def __init__(self, json_filename):
 		with open(json_filename, "r") as f:
 			self._raw_config = json.loads(f.read())
+
+	def get_data(self):
+		return self._raw_config

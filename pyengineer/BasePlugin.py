@@ -19,9 +19,28 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class BaseModule(object):
+class BasePlugin(object):
+	_ID = None
+	_TITLE = None
+	_MENU_HIERARCHY = None
+
 	def __init__(self, configuration):
+		assert(isinstance(self._ID, str))
+		assert(isinstance(self._TITLE, str))
+		assert(isinstance(self._MENU_HIERARCHY, tuple))
 		self._config = configuration
+
+	@property
+	def plugin_id(self):
+		return self._ID
+
+	@property
+	def plugin_title(self):
+		return self._TITLE
+
+	@property
+	def plugin_menu_hierarchy(self):
+		return self._MENU_HIERARCHY
 
 	@property
 	def config(self):
