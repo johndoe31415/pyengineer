@@ -19,16 +19,34 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-#from Units import Units
+import collections
+
+from pyengineer.Exceptions import InvalidThreadDefinitionException
 
 def pitch_turn_per_inch(x):
 	return 0.0254 / x
 
-class Thread():
-	def __init__(self, diameter, pitch):
-		"""diameter in meters, pitch in meters/turn"""
-		self._d = diameter
-		self._s = pitch
+class Thread(object):
+	def __init__(self, diameter, pitch, usage = None, group = None):
+		"""Diameter is given in meters, pitch given in meters/turn."""
+		self._diameter = diameter
+		self._pitch = pitch
+
+	@property
+	def diameter(self):
+		return self._diameter
+
+	@property
+	def pitch(self):
+		return self._pitch
+
+	@property
+	def usage(self):
+		return self._usage
+
+	@property
+	def group(self):
+		return self._group
 
 	def _diffval(x, y):
 		diff = abs(x / y)
@@ -51,28 +69,38 @@ class Thread():
 #		print("%-30s %-30s %.4f %.4f %.4f" % (str(self), str(other), ddiff, pdiff, sumdiff))
 		return sumdiff
 
-	def getdiameter(self):
-		return self._d
-
-	def getpitch(self):
-		return self._s
-
 	def __str__(self):
-		return "d=%sm s=%sm/turn" % (Units.unify(self._d), Units.unify(self._s))
+		return "d=%.1f p=%.1f" % (self.diameter, self.pitch)
 
-class ThreadValues():
-	_threaddb = {
-	}
+class ThreadDB(object):
+	_DIAMETER_ELEMENTS = set(("diameter", "diameter_thou", "diameter_inch"))
+	_PITCH_ELEMENTS = set(("pitch", "tpi"))
 
-	def getusage(threadclass, name):
-		if ThreadValues._threadusagedb.get(threadclass) is None:
-			return tuple()
-		if ThreadValues._threadusagedb.get(threadclass).get(name) is None:
-			return tuple()
-		return ThreadValues._threadusagedb[threadclass][name]
+	def __init__(self):
+		self._threads_by_group = collections.defaultdict(list)
 
-	def get(threadclass, name):
-		return ThreadValues._threaddb[threadclass][name]
+	def add(self, thread):
+		group = thread.group or "Misc"
+		self._threads_by_group[group].append(thread)
+
+	def add_by_definition(self, group_name, thread_data):
+		if "name" not in thread_data:
+			raise InvalidThreadDefinitionException("No 'name' element present in thread definition: %s" % (str(thread_data)))
+
+		diameter_elements = self._DIAMETER_ELEMENTS & thread_data.keys()
+		if len(diameter_elements) != 1:
+			raise InvalidThreadDefinitionException("Expected exactly one diameter element in thread definition, but got %d (%s): %s" % (len(diameter_elements), ", ".join(sorted(diameter_elements)), str(thread_data)))
+
+		pitch_elements = self._PITCH_ELEMENTS & thread_data.keys()
+		if len(pitch_elements) != 1:
+			raise InvalidThreadDefinitionException("Expected exactly one pitch element in thread definition, but got %d (%s): %s" % (len(pitch_elements), ", ".join(sorted(pitch_elements)), str(thread_data)))
+#		print(diameter_elements)
+#		print(thread_data)
+
+	def add_groups_by_definition(self, thread_groups):
+		for (group_name, threads_data) in thread_groups.items():
+			for thread_data in threads_data:
+				self.add_by_definition(group_name, thread_data)
 
 	def closest(refthread, closestn = 5):
 		diffs = [ ]
@@ -84,24 +112,4 @@ class ThreadValues():
 		diffs.sort()
 		return diffs[:closestn]
 
-
-if __name__ == "__main__":
-	ref = ThreadValues.get("Metric", "M4")
-	print("Reference: ", ref)
-	for c in  ThreadValues.closest(ref):
-		print("Close:", c)
-
-	print("-" * 120)
-
-	ref = Thread(6.66e-3, 6.55e-3 / 5)	# Air pressure 1/4"
-	print("Reference: ", ref)
-	for c in  ThreadValues.closest(ref):
-		print("Close:", c)
-
-	print("-" * 120)
-
-	ref = Thread(13.3e-3, 5.09e-3 / 3)		# Air pressure 1/2"
-	print("Reference: ", ref)
-	for c in  ThreadValues.closest(ref):
-		print("Close:", c)
 

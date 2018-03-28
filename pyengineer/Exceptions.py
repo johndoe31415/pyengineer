@@ -19,7 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .UnitValue import UnitValue
-from .ESeries import ESeries
-from .Threads import Thread, ThreadDB
-from .Exceptions import GeneralException
+class GeneralException(Exception): pass
+
+class InvalidThreadDefinitionException(GeneralException): pass

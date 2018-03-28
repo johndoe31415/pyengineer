@@ -19,7 +19,19 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .UnitValue import UnitValue
-from .ESeries import ESeries
-from .Threads import Thread, ThreadDB
-from .Exceptions import GeneralException
+import unittest
+import pkgutil
+import json
+from pyengineer import Thread, ThreadDB
+
+class ThreadsTests(unittest.TestCase):
+	def test_basic(self):
+		thread = Thread(diameter = 3, pitch = 0.25)
+		self.assertAlmostEqual(thread.diameter, 3)
+		self.assertAlmostEqual(thread.pitch, 0.25)
+
+	def test_db(self):
+		database_data = json.loads(pkgutil.get_data("pyengineer.data", "threads.json"))
+		db = ThreadDB()
+		db.add_groups_by_definition(database_data)
+		print(db)
