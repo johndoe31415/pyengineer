@@ -1,6 +1,6 @@
-<%def name="input_text(field_name, field_desc, default_value = '', righthand_side = None)">
+<%def name="input_text(field_name, field_desc, default_value = '', righthand_side = None, optional = False)">
 	<div class="form-group row">
-		<label for="${field_name}" class="col-2 col-form-label">${field_desc}:</label>
+		<label for="${field_name}" class="col-2 col-form-label${" text-secondary" if optional else ""}">${field_desc}:</label>
 		<div class="col-4">
 			<input type="text" class="form-control" id="${field_name}" name="${field_name}" value="${default_value}">
 		</div>
@@ -12,12 +12,14 @@
 	</div>
 </%def>
 
-<%def name="input_set(field_name, set_name, field_desc)">
+<%def name="input_set(field_name, set_name, field_desc, empty_value = None, optional = False)">
 	<div class="form-group row">
-		<label for="${field_name}" class="col-2 col-form-label">${field_desc}:</label>
+		<label for="${field_name}" class="col-2 col-form-label${" text-secondary" if optional else ""}">${field_desc}:</label>
 		<div class="col-4">
 			<select id="${field_name}" name="${field_name}" class="form-control populate_input_set" set_name="${set_name}">
-				<option value="">None</option>
+				%if empty_value is not None:
+				<option value="">${empty_value}</option>
+				%endif
 			</select>
 		</div>
 	</div>

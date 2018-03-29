@@ -5,7 +5,8 @@ _form_template = """
 	${input_text("v_in", "Input Voltage", righthand_side = "V")}
 	${input_text("v_load", "Load Voltage", righthand_side = "V")}
 	${input_text("i", "Current", righthand_side = "A")}
-	${input_set("r_set", "r", "Resistor set")}
+	${input_text("r_user", "Custom resistor choice", righthand_side = "Ω", optional = True)}
+	${input_set("r_set", "r", "Resistor set", empty_value = "None", optional = True)}
 	${submit_button("Calculate")}
 </form>
 """
@@ -102,6 +103,10 @@ class Plugin(BasePlugin):
 		eta = float(v_load) / float(v_in)
 
 		choices = [ ]
+		if parameters["r_user"] != "":
+			r_user = UnitValue(parameters["r_user"])
+			choices.append(self._calculate_choice("User choice", r = r_user, v_in = float(v_in), v_load = float(v_load), i = float(i)))
+
 		if parameters["r_set"] != "":
 			r_set = self.config.get_valuesets("r")[parameters["r_set"]]
 			(smaller, larger) = r_set.find_closest(r)
