@@ -33,6 +33,14 @@ class Configuration(object):
 		for (set_group, sets_data) in self._raw_config["sets"].items():
 			self._sets[set_group] = ValueSets.from_dict(sets_data)
 
+		self._values = collections.defaultdict(list)
+		for (value_group, values_data) in self._raw_config["values"].items():
+			for value_data in values_data:
+				self._values[value_group].append(UnitValue(value_data))
+
+	def iter_values(self, valuegroup_name):
+		return iter(self._values[valuegroup_name])
+
 	def get_valuesets(self, valueset_group):
 		return self._sets[valueset_group]
 

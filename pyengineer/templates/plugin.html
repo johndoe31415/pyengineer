@@ -40,15 +40,25 @@ $.ajax({
 	type: "GET",
 	dataType: "json",
 	success: function(result) {
-		$(".populate_input_set").each(function(index, element) {
+		$(".populate_input_set").each(function() {
 			const combobox_element = $(this);
 			const set_name = combobox_element.attr("set_name");
 			for (let i in result.sets[set_name]) {
 				let name = result.sets[set_name][i];
 				combobox_element.append(new Option(name, name));
 			}
-
 		});
+
+		$(".populate_input_values").each(function() {
+			const combobox_element = $(this);
+			const values_name = combobox_element.attr("values_name");
+			const values_suffix = combobox_element.attr("values_suffix");
+			for (let i in result.values[values_name]) {
+				let name = result.values[values_name][i]["repr"] + values_suffix;
+				combobox_element.append(new Option(name, result.values[values_name][i]["raw"]));
+			}
+		});
+
 	},
 	error: function(result) {
 		console.log("Couldn't fetch configuration JSON.");
