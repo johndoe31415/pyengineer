@@ -41,28 +41,28 @@ class UnitValueTests(unittest.TestCase):
 		self.assertAlmostEqual(float(UnitValue("12345T")), 12345e12)
 
 	def test_format(self):
-		self.assertEqual(UnitValue("0").format(significant_digits = 1), "0")
-		self.assertEqual(UnitValue("0").format(significant_digits = 2), "0.0")
-		self.assertEqual(UnitValue("0").format(significant_digits = 3), "0.00")
-		self.assertEqual(UnitValue("0").format(significant_digits = 4), "0.000")
+		self.assertEqual(UnitValue("0").format(significant_digits = 1), "0 ")
+		self.assertEqual(UnitValue("0").format(significant_digits = 2), "0.0 ")
+		self.assertEqual(UnitValue("0").format(significant_digits = 3), "0.00 ")
+		self.assertEqual(UnitValue("0").format(significant_digits = 4), "0.000 ")
 
-		self.assertEqual(UnitValue("1").format(significant_digits = 1), "1")
-		self.assertEqual(UnitValue("1").format(significant_digits = 2), "1.0")
-		self.assertEqual(UnitValue("1").format(significant_digits = 3), "1.00")
-		self.assertEqual(UnitValue("1").format(significant_digits = 4), "1.000")
+		self.assertEqual(UnitValue("1").format(significant_digits = 1), "1 ")
+		self.assertEqual(UnitValue("1").format(significant_digits = 2), "1.0 ")
+		self.assertEqual(UnitValue("1").format(significant_digits = 3), "1.00 ")
+		self.assertEqual(UnitValue("1").format(significant_digits = 4), "1.000 ")
 
-		self.assertEqual(UnitValue("-1").format(significant_digits = 1), "-1")
-		self.assertEqual(UnitValue("-1").format(significant_digits = 2), "-1.0")
-		self.assertEqual(UnitValue("-1").format(significant_digits = 3), "-1.00")
-		self.assertEqual(UnitValue("-1").format(significant_digits = 4), "-1.000")
+		self.assertEqual(UnitValue("-1").format(significant_digits = 1), "-1 ")
+		self.assertEqual(UnitValue("-1").format(significant_digits = 2), "-1.0 ")
+		self.assertEqual(UnitValue("-1").format(significant_digits = 3), "-1.00 ")
+		self.assertEqual(UnitValue("-1").format(significant_digits = 4), "-1.000 ")
 
-		self.assertEqual(UnitValue("1").format(significant_digits = 3), "1.00")
-		self.assertEqual(UnitValue("12").format(significant_digits = 3), "12.0")
-		self.assertEqual(UnitValue("123").format(significant_digits = 3), "123")
+		self.assertEqual(UnitValue("1").format(significant_digits = 3), "1.00 ")
+		self.assertEqual(UnitValue("12").format(significant_digits = 3), "12.0 ")
+		self.assertEqual(UnitValue("123").format(significant_digits = 3), "123 ")
 
-		self.assertEqual(UnitValue("1").format(significant_digits = 4), "1.000")
-		self.assertEqual(UnitValue("12").format(significant_digits = 4), "12.00")
-		self.assertEqual(UnitValue("123").format(significant_digits = 4), "123.0")
+		self.assertEqual(UnitValue("1").format(significant_digits = 4), "1.000 ")
+		self.assertEqual(UnitValue("12").format(significant_digits = 4), "12.00 ")
+		self.assertEqual(UnitValue("123").format(significant_digits = 4), "123.0 ")
 
 		self.assertEqual(UnitValue("1234").format(significant_digits = 4), "1.234 k")
 		self.assertEqual(UnitValue("12345").format(significant_digits = 4), "12.35 k")
@@ -87,9 +87,9 @@ class UnitValueTests(unittest.TestCase):
 		self.assertEqual(UnitValue(1.23e-3).format(significant_digits = 3), "1.23 m")
 		self.assertEqual(UnitValue(1.23e-2).format(significant_digits = 3), "12.3 m")
 		self.assertEqual(UnitValue(1.23e-1).format(significant_digits = 3), "123 m")
-		self.assertEqual(UnitValue(1.23e0).format(significant_digits = 3), "1.23")
-		self.assertEqual(UnitValue(1.23e1).format(significant_digits = 3), "12.3")
-		self.assertEqual(UnitValue(1.23e2).format(significant_digits = 3), "123")
+		self.assertEqual(UnitValue(1.23e0).format(significant_digits = 3), "1.23 ")
+		self.assertEqual(UnitValue(1.23e1).format(significant_digits = 3), "12.3 ")
+		self.assertEqual(UnitValue(1.23e2).format(significant_digits = 3), "123 ")
 		self.assertEqual(UnitValue(1.23e3).format(significant_digits = 3), "1.23 k")
 		self.assertEqual(UnitValue(1.23e4).format(significant_digits = 3), "12.3 k")
 		self.assertEqual(UnitValue(1.23e5).format(significant_digits = 3), "123 k")
@@ -108,3 +108,12 @@ class UnitValueTests(unittest.TestCase):
 		self.assertEqual(UnitValue(1.23e18).format(significant_digits = 3), "1230 E")
 		self.assertEqual(UnitValue(1.23e19).format(significant_digits = 3), "12300 E")
 
+	def test_init_unitvalue(self):
+		x = UnitValue("1.2345")
+		self.assertEqual(x, x)
+
+		y = UnitValue("1.2345")
+		self.assertEqual(x, y)
+
+		y = UnitValue(x)
+		self.assertEqual(x, y)

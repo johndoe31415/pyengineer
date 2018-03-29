@@ -22,7 +22,7 @@
 from .UnitValue import UnitValue
 from .ESeries import ESeries
 from .Threads import Thread, ThreadDB
-from .Exceptions import GeneralException
+from .Exceptions import GeneralException, InputDataException
 from .Configuration import Configuration
 from .GUIApplication import GUIApplication
 from .LocalTemplateLookup import LocalTemplateLookup

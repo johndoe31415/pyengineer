@@ -33,3 +33,18 @@ ${rendered_form_html}
 
 <div class="container" id="response">
 </div>
+
+<script>
+$.ajax({
+	url: "/config",
+	type: "GET",
+	dataType: "json",
+	success: function(result) {
+		console.log(result);
+	},
+	error: function(result) {
+		console.log("Couldn't fetch configuration JSON.");
+		console.log(result);
+	}
+})
+</script>

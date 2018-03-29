@@ -1,0 +1,15 @@
+<%def name="result_table_begin(*cols)">
+<table class="table table-striped">
+	<thead>
+		<tr>
+			%for col in cols:
+			<th scope="col">${col}</th>
+			%endfor
+		</tr>
+	</thead>
+	<tbody>
+</%def>
+<%def name="result_table_end()">
+	</tbody>
+</table>
+</%def>

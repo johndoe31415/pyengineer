@@ -24,6 +24,7 @@ import flask
 import traceback
 import importlib.machinery
 from mako.lookup import TemplateLookup
+from .Exceptions import DuplicatePluginIDException, DuplicateEntryException
 
 class MenuHierarchy(object):
 	def __init__(self, name = None, parent = None):
@@ -88,15 +89,23 @@ class GUIApplication(object):
 		self._app.add_url_rule("/config", "config", self._serve_config)
 		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>", "plugin_index", self._serve_plugin_index)
 		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>/<endpoint>", "plugin_request", self._serve_plugin_request, methods = [ "POST" ])
-		self._load_plugin("SimpleDeunify.py")
-		self._menu.dump()
+		self._load_plugins(self._config.plugin_directory)
 
 	def _load_plugin(self, python_filename):
-		module = importlib.machinery.SourceFileLoader("plugin_module", python_filename).load_plugin()
+		module = importlib.machinery.SourceFileLoader("plugin_module", python_filename).load_module()
 		plugin_class = module.Plugin
 		instance = plugin_class(self._config)
+		if instance.plugin_id in self._plugins:
+			raise DuplicatePluginIDException("Cannot load plugin %s: Plugin with UUID %s already loaded (%s)." % (python_filename, instance.plugin_id, " -> ".join(self._plugins[instance.plugin_id].plugin_menu_hierarchy)))
 		self._plugins[instance.plugin_id] = instance
 		self._menu.register(instance.plugin_menu_hierarchy, instance)
+
+	def _load_plugins(self, plugin_directory):
+		if not plugin_directory.endswith("/"):
+			plugin_directory += "/"
+		for filename in filter(lambda name: name.endswith(".py"), os.listdir(plugin_directory)):
+			full_filename = plugin_directory + filename
+			self._load_plugin(full_filename)
 
 	def _serve(self, template_name, variables = None):
 		template = self._lookup.get_template(template_name)
@@ -164,7 +173,7 @@ class GUIApplication(object):
 		})
 
 	def _serve_config(self):
-		return flask.jsonify(self._config.get_data())
+		return flask.jsonify(self._config.json())
 
 	@property
 	def app(self):

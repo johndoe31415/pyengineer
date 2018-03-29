@@ -20,11 +20,32 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import json
+import collections
+from pyengineer import UnitValue
 
 class Configuration(object):
 	def __init__(self, json_filename):
 		with open(json_filename, "r") as f:
 			self._raw_config = json.loads(f.read())
 
-	def get_data(self):
-		return self._raw_config
+	@property
+	def plugin_directory(self):
+		# TODO: Hardcoded for now
+		return "plugins"
+
+	def json(self):
+		data = {
+			"sets": collections.defaultdict(list),
+			"values": collections.defaultdict(list),
+		}
+		for (set_name, sets) in self._raw_config["sets"].items():
+			for specific_set in sets:
+				data["sets"][set_name].append(specific_set["name"])
+
+		repr_callbacks = {
+			"frequencies":	lambda value: value.format(significant_digits = 6),
+		}
+		for (value_name, values) in self._raw_config["values"].items():
+			for value in values:
+				data["values"][value_name].append(UnitValue(value, repr_callback = repr_callbacks.get(value_name)).json())
+		return data

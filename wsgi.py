@@ -26,4 +26,8 @@ config = Configuration("configuration.json")
 gui_application = GUIApplication(config)
 
 if __name__ == "__main__":
-	gui_application.app.run()
+	import os
+	plugin_dir = "plugins/"
+	extra_files = [ plugin_dir + filename for filename in filter(lambda name: name.endswith(".py"), os.listdir(plugin_dir)) ]
+	extra_files += [ "configuration.json" ]
+	gui_application.app.run(debug = True, extra_files = extra_files)

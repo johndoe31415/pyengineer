@@ -9,7 +9,7 @@ _form_template = """
 """
 
 _response_template = """
-${"%.3f" % (d["value"])} = ${"%.2e" % (d["value"])} = ${d["value_fmt"]}
+${"%.3f" % (d["value"]["flt"])} = ${"%.2e" % (d["value"]["flt"])} = <strong>${d["value"]["fmt"]}</strong>
 """
 
 class Plugin(BasePlugin):
@@ -23,8 +23,7 @@ class Plugin(BasePlugin):
 		value = UnitValue(parameters["input_value"])
 		significant_digits = int(parameters["significant_digits"])
 		return {
-			"value":				float(value),
-			"value_fmt":			value.format(significant_digits = significant_digits),
+			"value":				value.json(significant_digits = significant_digits),
 			"significant_digits":	significant_digits,
 		}
 

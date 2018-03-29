@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import enum
 import math
 from fractions import Fraction
 
@@ -37,7 +38,12 @@ class UnitValue(object):
 		("E",	15),
 	)
 
-	def __init__(self, value):
+	def __init__(self, value, repr_callback = None):
+		if isinstance(value, UnitValue):
+			value = value._value
+
+		self._raw_value = value
+
 		# Unit specified?
 		exponent = 0
 		if isinstance(value, str):
@@ -48,6 +54,22 @@ class UnitValue(object):
 					value = value[:-len(si_prefix)]
 					break
 		self._value = Fraction(value) * (10 ** exponent)
+		if repr_callback is not None:
+			self._repr_callback = repr_callback
+		else:
+			self._repr_callback = lambda value: value.raw_value
+
+	@property
+	def exact_value(self):
+		return self._value
+
+	@property
+	def raw_value(self):
+		return self._raw_value
+
+	@property
+	def representation(self):
+		return self._repr_callback(self)
 
 	def format(self, significant_digits = 3):
 		assert(significant_digits >= 1)
@@ -83,14 +105,43 @@ class UnitValue(object):
 		if si_prefix is None:
 			unit_str = ""
 		else:
-			unit_str = " %s" % (si_prefix)
-		return "%s%.*f%s" % (sign, post_decimal, mantissa, unit_str)
+			unit_str = si_prefix
+		return "%s%.*f %s" % (sign, post_decimal, mantissa, unit_str)
+
+	def json(self, significant_digits = 3):
+		return {
+			"flt":		float(self),
+			"raw":		self.raw_value,
+			"fmt":		self.format(significant_digits = significant_digits),
+			"repr":		self.representation,
+		}
+
+	def __ge__(self, other):
+		return self._value >= other._value
+
+	def __gt__(self, other):
+		return self._value > other._value
+
+	def __le__(self, other):
+		return self._value <= other._value
+
+	def __lt__(self, other):
+		return self._value < other._value
 
 	def __eq__(self, other):
 		return self._value == other._value
 
+	def __neq__(self, other):
+		return not (self == other)
+
+	def __hash__(self):
+		return hash(self._value)
+
 	def __float__(self):
 		return float(self._value)
+
+	def __repr__(self):
+		return "UV(%s)" % (self.representation)
 
 	def __str__(self):
 		return self.format(significant_digits = 3)

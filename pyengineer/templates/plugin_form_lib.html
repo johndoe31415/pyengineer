@@ -11,6 +11,18 @@
 		%endif
 	</div>
 </%def>
+
+<%def name="input_set(field_name, set_name, field_desc)">
+	<div class="form-group row">
+		<label for="${field_name}" class="col-2 col-form-label">${field_desc}:</label>
+		<div class="col-4">
+			<select id="${field_name}" name="${field_name}" class="form-control populate_input_set" set_name="${set_name}">
+				<option value="None">None</option>
+			</select>
+		</div>
+	</div>
+</%def>
+
 <%def name="submit_button(button_text, endpoint = None)">
 	<button onclick="submit_data('${request_uri(endpoint)}'); return false" class="btn btn-primary">${button_text}</button>
 </%def>

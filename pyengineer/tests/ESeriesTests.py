@@ -20,6 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import unittest
+import fractions
 from pyengineer import ESeries
 
 class ESeriesTests(unittest.TestCase):
@@ -47,3 +48,17 @@ class ESeriesTests(unittest.TestCase):
 
 		values = list(eseries.from_to(1000, 10001))
 		self.assertEqual(values, [ 1e3, 1.5e3, 2.2e3, 3.3e3, 4.7e3, 6.8e3, 10e3 ])
+
+	def test_range_inclusive(self):
+		eseries = ESeries.standard(6)
+		values = list(eseries.from_to(1000, 10000, maxvalue_inclusive = True))
+		self.assertEqual(values, [ 1e3, 1.5e3, 2.2e3, 3.3e3, 4.7e3, 6.8e3, 10e3 ])
+
+	def test_range_extreme(self):
+		eseries = ESeries.standard(6)
+
+		value = fractions.Fraction(33, 100000000000000000)
+		self.assertEqual(eseries.closest(value).value, value)
+
+		value = fractions.Fraction(3300000000000000000, 1)
+		self.assertEqual(eseries.closest(value).value, value)
