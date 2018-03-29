@@ -19,16 +19,32 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from pyengineer import LocalTemplateLookup
+
 class BasePlugin(object):
 	_ID = None
 	_TITLE = None
 	_MENU_HIERARCHY = None
+	__TEMPLATE_PREFIX = "<%namespace file=\"plugin_content.html\" import=\"*\" />\n"
 
 	def __init__(self, configuration):
 		assert(isinstance(self._ID, str))
 		assert(isinstance(self._TITLE, str))
 		assert(isinstance(self._MENU_HIERARCHY, tuple))
 		self._config = configuration
+		variables = {
+			"request_uri":	self.__request_uri,
+		}
+		self._html = LocalTemplateLookup().create(self.__TEMPLATE_PREFIX + self.template_source).render(**variables)
+
+	def __request_uri(self, endpoint = None):
+		if endpoint is None:
+			endpoint = "default"
+		return "/plugins/" + self.plugin_id + "/" + endpoint
+
+	@property
+	def html(self):
+		return self._html
 
 	@property
 	def plugin_id(self):
@@ -45,3 +61,8 @@ class BasePlugin(object):
 	@property
 	def config(self):
 		return self._config
+
+	@property
+	def template_source(self):
+		return "Template source undefined in derived class."
+

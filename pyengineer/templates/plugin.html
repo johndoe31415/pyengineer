@@ -1,6 +1,19 @@
 <%inherit file="base.html" />
 
-PLUGIN
+<script>
+function submit_data(uri) {
+	const submit_data_array = $("#input_data").serializeArray();
+	console.log(submit_data_array);
+
+	var submit_data = { };
+	$(submit_data_array).each(function(index, obj) {
+	    submit_data[obj.name] = obj.value;
+	});
+	
+	console.log(submit_data);
+
+	$.post(uri, alert);
+}
+</script>
 
 ${plugin_content}
-CONTENT

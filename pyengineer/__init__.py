@@ -25,4 +25,5 @@ from .Threads import Thread, ThreadDB
 from .Exceptions import GeneralException
 from .Configuration import Configuration
 from .GUIApplication import GUIApplication
+from .LocalTemplateLookup import LocalTemplateLookup
 from .BasePlugin import BasePlugin

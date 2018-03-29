@@ -1,0 +1,16 @@
+<%def name="input_text(field_name, field_desc, unit_name = None)">
+	<div class="form-group row">
+		<label for="${field_name}" class="col-2 col-form-label">${field_desc}:</label>
+		<div class="col-4">
+			<input type="text" class="form-control" id="${field_name}" name="${field_name}">
+		</div>
+		%if unit_name is not None:
+		<div class="col-1 col-form-label">
+			${unit_name}
+		</div>
+		%endif
+	</div>
+</%def>
+<%def name="submit_button(button_text)">
+	<button onclick="submit_data(); return false" class="btn btn-primary">${button_text}</button>
+</%def>

@@ -114,7 +114,7 @@ class GUIApplication(object):
 	def _serve_plugin_index(self, plugin_uuid):
 		instance = self._modules[str(plugin_uuid)]
 		variables = {
-			"plugin_content":		instance.index(),
+			"plugin_content":		instance.html,
 		}
 		return self._serve("plugin.html", variables)
 
