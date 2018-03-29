@@ -23,7 +23,7 @@ class Plugin(BasePlugin):
 		value = UnitValue(parameters["input_value"])
 		significant_digits = int(parameters["significant_digits"])
 		return {
-			"value":				value.json(significant_digits = significant_digits),
+			"value":				value.to_dict(significant_digits = significant_digits),
 			"significant_digits":	significant_digits,
 		}
 

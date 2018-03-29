@@ -41,7 +41,7 @@ class Configuration(object):
 		# TODO: Hardcoded for now
 		return "plugins"
 
-	def json(self):
+	def to_dict(self):
 		data = {
 			"sets": collections.defaultdict(list),
 			"values": collections.defaultdict(list),

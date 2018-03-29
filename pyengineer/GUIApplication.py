@@ -173,7 +173,7 @@ class GUIApplication(object):
 		})
 
 	def _serve_config(self):
-		return flask.jsonify(self._config.json())
+		return flask.jsonify(self._config.to_dict())
 
 	@property
 	def app(self):

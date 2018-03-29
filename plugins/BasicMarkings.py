@@ -39,9 +39,9 @@ class Plugin(BasePlugin):
 		value = base * (10 ** exponent)
 		return {
 			"marking": marking,
-			"r":		UnitValue(value).json(),
-			"c":		UnitValue(value * 1e-12).json(),
-			"l":		UnitValue(value * 1e-6).json(),
+			"r":		UnitValue(value).to_dict(),
+			"c":		UnitValue(value * 1e-12).to_dict(),
+			"l":		UnitValue(value * 1e-6).to_dict(),
 		}
 
 

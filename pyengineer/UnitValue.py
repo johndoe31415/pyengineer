@@ -108,7 +108,7 @@ class UnitValue(object):
 			unit_str = si_prefix
 		return "%s%.*f %s" % (sign, post_decimal, mantissa, unit_str)
 
-	def json(self, significant_digits = 3):
+	def to_dict(self, significant_digits = 3):
 		return {
 			"flt":		float(self),
 			"raw":		self.raw_value,

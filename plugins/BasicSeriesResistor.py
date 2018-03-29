@@ -83,10 +83,10 @@ class Plugin(BasePlugin):
 		abs_error = UnitValue(actual_v_load - v_load)
 		return {
 			"name":			name,
-			"r":			r.json(),
-			"v_load":		UnitValue(actual_v_load).json(),
+			"r":			r.to_dict(),
+			"v_load":		UnitValue(actual_v_load).to_dict(),
 			"rel_error":	rel_error,
-			"abs_error":	abs_error.json(),
+			"abs_error":	abs_error.to_dict(),
 		}
 
 	def request(self, endpoint, parameters):
@@ -116,12 +116,12 @@ class Plugin(BasePlugin):
 				choices.append(self._calculate_choice("Larger in set", r = larger, v_in = float(v_in), v_load = float(v_load), i = float(i)))
 
 		return {
-			"v_in":		v_in.json(),
-			"v_load":	v_load.json(),
-			"i":		i.json(),
-			"v_r":		UnitValue(v_r).json(),
-			"r":		UnitValue(r).json(),
-			"p_r":		UnitValue(p_r).json(),
+			"v_in":		v_in.to_dict(),
+			"v_load":	v_load.to_dict(),
+			"i":		i.to_dict(),
+			"v_r":		UnitValue(v_r).to_dict(),
+			"r":		UnitValue(r).to_dict(),
+			"p_r":		UnitValue(p_r).to_dict(),
 			"eta":		eta,
 			"choices":	choices,
 		}
