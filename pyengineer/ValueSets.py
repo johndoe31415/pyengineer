@@ -24,10 +24,14 @@ from pyengineer import UnitValue, ESeries
 from pyengineer.Exceptions import DuplicateEntryException, DataMissingException, InvalidDataException
 
 class ValueSet(object):
-	def __init__(self, name, values, resolved = True):
+	def __init__(self, name, values, additional_data = None):
 		self._name = name
-		self._values = tuple(sorted(set(values)))
-		self._resolved = resolved
+		if values is not None:
+			self._values = tuple(sorted(set(values)))
+			self._resolved = True
+		else:
+			self._resolved = False
+		self._additional_data = additional_data
 
 	def find_closest(self, value):
 		value = UnitValue(value)
@@ -70,6 +74,10 @@ class ValueSet(object):
 			(minval, maxval) = UnitValue(dict_data["min"]), UnitValue(dict_data["max"])
 			values = [ UnitValue(v) for v in eseries.from_to(minval.exact_value, maxval.exact_value, maxvalue_inclusive = True) ]
 			return cls(name = dict_data["name"], values = values)
+		elif vs_type == "union":
+			if not "groups" in dict_data:
+				raise DataMissingException("No 'groups' attribute in union ValueSet definition: %s" % (str(dict_data)))
+			return cls(name = dict_data["name"], values = None, additional_data = dict_data["groups"])
 		else:
 			raise InvalidDataException("Invalid 'type' attribute of ValueSet '%s': %s" % (vs_type, str(dict_data)))
 
@@ -79,11 +87,18 @@ class ValueSet(object):
 	def __len__(self):
 		return len(self._values)
 
+	@property
 	def resolved(self):
 		return self._resolved
 
 	def resolve(self, valuesets):
-		pass
+		if self.resolved:
+			return
+		values = set()
+		for group_name in self._additional_data:
+			values |= set(valuesets[group_name])
+		self._values = tuple(sorted(values))
+		self._resolved = True
 
 class ValueSets(object):
 	def __init__(self):
@@ -108,7 +123,7 @@ class ValueSets(object):
 		# TODO: This in unable to handle recursive cross-references for now
 		for valueset in valuesets:
 			if not valueset.resolved:
-				valueset.resolve(self)
+				valueset.resolve(valuesets)
 
 		return valuesets
 

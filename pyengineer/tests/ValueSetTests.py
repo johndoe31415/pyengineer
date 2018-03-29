@@ -51,6 +51,31 @@ class ValueSetTests(unittest.TestCase):
 		self.assertEqual(len(vs), 13)
 		self.assertEqual([ float(x) for x in vs ], [ 10, 15, 22, 33, 47, 68, 100, 150, 220, 330, 470, 680, 1000 ])
 
+	def test_union(self):
+		data = [
+			{
+				"name":		"foo",
+				"type":		"explicit",
+				"items":	[ "1k", "5", "1", "10k", "10000", "5", "0.01M" ],
+			},
+			{
+				"name":		"bar",
+				"type":		"explicit",
+				"items":	[ "3", "33", "5", "1", "9" ],
+			},
+			{
+				"name":		"foobar",
+				"type":		"union",
+				"groups":	[ "foo", "bar" ],
+			},
+
+		]
+		sets = ValueSets.from_dict(data)
+		vs = sets["foobar"]
+		self.assertEqual(len(vs), 7)
+		self.assertEqual([ float(x) for x in vs ], [ 1, 3, 5, 9, 33, 1e3, 10e3 ])
+
+
 	def test_find_closest(self):
 		data = [
 			{
