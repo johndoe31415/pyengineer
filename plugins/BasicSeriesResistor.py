@@ -43,6 +43,27 @@ ${result_table_begin("Parameter", "Symbol", "Value")}
 	<td>η = </td>
 	<td>${"%.1f%%" % (100 * d["eta"])}</td>
 </tr>
+
+%for choice in d["choices"]:
+<tr>
+	  <th colspan="3">Resistor choice: ${choice["name"]}</th>
+</tr>
+<tr>
+	<td>Resistor value:</td>
+	<td>R = </td>
+	<td>${choice["r"]["fmt"]}Ω</td>
+</tr>
+<tr>
+	<td>Actual load voltage:</td>
+	<td>V = </td>
+	<td>${choice["v_load"]["fmt"]}</td>
+</tr>
+<tr>
+	<td colspan="2">Voltage error:</td>
+	<td>${"%+.1f%%" % (100 * choice["rel_error"])} / ${choice["abs_error"]["fmt"]}V</td>
+</tr>
+%endfor
+
 ${result_table_end()}
 """
 
@@ -52,6 +73,20 @@ class Plugin(BasePlugin):
 	_MENU_HIERARCHY = ("Basics", "Series Resistor")
 	_FORM_TEMPLATE = _form_template
 	_RESPONSE_TEMPLATE = _response_template
+
+	@staticmethod
+	def _calculate_choice(name, r, v_in, v_load, i):
+		r_load = v_load / i
+		actual_v_load = v_in * r_load / (r_load + float(r))
+		rel_error = (actual_v_load - v_load) / v_load
+		abs_error = UnitValue(actual_v_load - v_load)
+		return {
+			"name":			name,
+			"r":			r.json(),
+			"v_load":		UnitValue(actual_v_load).json(),
+			"rel_error":	rel_error,
+			"abs_error":	abs_error.json(),
+		}
 
 	def request(self, endpoint, parameters):
 		v_in = UnitValue(parameters["v_in"])
@@ -66,6 +101,15 @@ class Plugin(BasePlugin):
 		p_r = float(i) * v_r
 		eta = float(v_load) / float(v_in)
 
+		choices = [ ]
+		if parameters["r_set"] != "":
+			r_set = self.config.get_valuesets("r")[parameters["r_set"]]
+			(smaller, larger) = r_set.find_closest(r)
+			if smaller is not None:
+				choices.append(self._calculate_choice("Smaller in set", r = smaller, v_in = float(v_in), v_load = float(v_load), i = float(i)))
+			if larger is not None:
+				choices.append(self._calculate_choice("Larger in set", r = larger, v_in = float(v_in), v_load = float(v_load), i = float(i)))
+
 		return {
 			"v_in":		v_in.json(),
 			"v_load":	v_load.json(),
@@ -74,6 +118,7 @@ class Plugin(BasePlugin):
 			"r":		UnitValue(r).json(),
 			"p_r":		UnitValue(p_r).json(),
 			"eta":		eta,
+			"choices":	choices,
 		}
 
 

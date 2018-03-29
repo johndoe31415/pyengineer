@@ -22,11 +22,19 @@
 import json
 import collections
 from pyengineer import UnitValue
+from pyengineer.ValueSets import ValueSets
 
 class Configuration(object):
 	def __init__(self, json_filename):
 		with open(json_filename, "r") as f:
 			self._raw_config = json.loads(f.read())
+
+		self._sets = { }
+		for (set_group, sets_data) in self._raw_config["sets"].items():
+			self._sets[set_group] = ValueSets.from_dict(sets_data)
+
+	def get_valuesets(self, valueset_group):
+		return self._sets[valueset_group]
 
 	@property
 	def plugin_directory(self):

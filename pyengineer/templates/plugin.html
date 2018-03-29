@@ -40,7 +40,15 @@ $.ajax({
 	type: "GET",
 	dataType: "json",
 	success: function(result) {
-		console.log(result);
+		$(".populate_input_set").each(function(index, element) {
+			const combobox_element = $(this);
+			const set_name = combobox_element.attr("set_name");
+			for (let i in result.sets[set_name]) {
+				let name = result.sets[set_name][i];
+				combobox_element.append(new Option(name, name));
+			}
+
+		});
 	},
 	error: function(result) {
 		console.log("Couldn't fetch configuration JSON.");
