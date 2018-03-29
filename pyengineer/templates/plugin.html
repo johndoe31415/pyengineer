@@ -15,12 +15,15 @@ function submit_data(uri) {
 		type: "POST",
 		data: submit_data_json,
 		contentType: "application/json; charset=utf-8",
-		dataType: "json",
+		dataType: "html",
 		success: function(result) {
-			show_result(result);
+			$("#response").html(result);
 		}
 	})
 }
 </script>
 
-${plugin_content}
+${rendered_form_html}
+
+<div id="response">
+</div>

@@ -1,0 +1,8 @@
+%if r["status"] == "ok":
+${self.body()}
+%else:
+<!-- Response was not okay -->
+<div class="alert alert-danger" role="alert">
+	<strong>${r["errorcode"]}</strong>: ${r["description"]}
+</div>
+%endif

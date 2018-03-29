@@ -1,20 +1,13 @@
 from pyengineer import BasePlugin, UnitValue
 
-_template_source = """
-
-<script>
-function show_result(response) {
-	alert(response);
-}
-</script>
-
+_form_template = """
 <form id="input_data">
 	${input_text("input_value", "Input value")}
 	${submit_button("Calculate")}
 </form>
 """
 
-_response_source = """
+_response_template = """
 That's da response
 
 ${r["data"]["value_fmt"]}
@@ -33,12 +26,12 @@ class Plugin(BasePlugin):
 		}
 
 	@property
-	def template_source(self):
-		return _template_source
+	def form_template(self):
+		return _form_template
 
 	@property
-	def response_source(self):
-		return _response_source
+	def response_template(self):
+		return _response_template
 
 if __name__ == "__main__":
 	from pyengineer import Configuration

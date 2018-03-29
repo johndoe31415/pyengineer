@@ -115,7 +115,7 @@ class GUIApplication(object):
 	def _serve_plugin_index(self, plugin_uuid):
 		instance = self._plugins[str(plugin_uuid)]
 		variables = {
-			"plugin_content":		instance.html,
+			"rendered_form_html":	instance.rendered_form_html,
 		}
 		return self._serve("plugin.html", variables)
 
@@ -128,10 +128,11 @@ class GUIApplication(object):
 				"description":	"No 'Accept' header set.",
 			})
 
-		if flask.request.headers["Accept"] == "application/json":
+		accepts = flask.request.accept_mimetypes.best_match([ "application/json", "text/html" ])
+		if accepts == "application/json":
 			renderer = flask.jsonify
-		elif flask.request.headers["Accept"] == "text/html":
-			renderer = instance.response_renderer
+		elif accepts == "text/html":
+			renderer = instance.render_response
 		else:
 			return flask.jsonify({
 				"status":		"failed",

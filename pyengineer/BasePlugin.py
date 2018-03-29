@@ -25,8 +25,8 @@ class BasePlugin(object):
 	_ID = None
 	_TITLE = None
 	_MENU_HIERARCHY = None
-	__RESPONSE_TEMPLATE_PREFIX = ""
-	__TEMPLATE_PREFIX = "<%namespace file=\"plugin_content.html\" import=\"*\" />\n"
+	__FORM_TEMPLATE_PREFIX = "<%namespace file=\"plugin_form_lib.html\" import=\"*\" />\n"
+	__RESPONSE_TEMPLATE_PREFIX = "<%namespace file=\"plugin_response_lib.html\" import=\"*\" />\n<%inherit file=\"plugin_response_base.html\" />\n"
 
 	def __init__(self, configuration):
 		assert(isinstance(self._ID, str))
@@ -36,9 +36,16 @@ class BasePlugin(object):
 		variables = {
 			"request_uri":	self.__request_uri,
 		}
-		self._html = LocalTemplateLookup().create(self.__TEMPLATE_PREFIX + self.template_source).render(**variables)
-		if self.response_source is not None:
-			self._response_template = LocalTemplateLookup().create(self.__RESPONSE_TEMPLATE_PREFIX + self.response_source)
+
+		# Render the request handler completely now
+		form_template = self.__FORM_TEMPLATE_PREFIX + self.form_template
+		self._rendered_form_html = LocalTemplateLookup().create(form_template).render(**variables)
+
+		# But only prepare the response handler (so we can render it with
+		# actual responses later)
+		if self.response_template is not None:
+			response_template = self.__RESPONSE_TEMPLATE_PREFIX + self.response_template
+			self._response_template = LocalTemplateLookup().create(response_template)
 		else:
 			self._response_template = None
 
@@ -48,8 +55,8 @@ class BasePlugin(object):
 		return "/plugins/" + self.plugin_id + "/" + endpoint
 
 	@property
-	def html(self):
-		return self._html
+	def rendered_form_html(self):
+		return self._rendered_form_html
 
 	@property
 	def plugin_id(self):
@@ -68,10 +75,14 @@ class BasePlugin(object):
 		return self._config
 
 	@property
-	def template_source(self):
+	def form_template(self):
 		return "Template source undefined in derived class."
 
-	def response_renderer(self, response):
+	@property
+	def response_template(self):
+		return None
+
+	def render_response(self, response):
 		if self._response_template is None:
 			return "No response renderer defined in derived class.\n"
 		else:
