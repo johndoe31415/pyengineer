@@ -24,7 +24,7 @@ import flask
 import traceback
 import importlib.machinery
 from mako.lookup import TemplateLookup
-from .Exceptions import DuplicatePluginIDException, DuplicateEntryException
+from .Exceptions import InputDataException, DuplicatePluginIDException, DuplicateEntryException
 
 class MenuHierarchy(object):
 	def __init__(self, name = None, parent = None):
@@ -159,7 +159,7 @@ class GUIApplication(object):
 			})
 		try:
 			result = instance.request(endpoint, flask.request.json)
-		except (KeyError, ValueError) as e:
+		except (KeyError, ValueError, InputDataException) as e:
 			print(traceback.format_exc())
 			return renderer({
 				"status":		"exception",
