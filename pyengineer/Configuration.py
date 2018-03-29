@@ -55,5 +55,5 @@ class Configuration(object):
 		}
 		for (value_name, values) in self._raw_config["values"].items():
 			for value in values:
-				data["values"][value_name].append(UnitValue(value, repr_callback = repr_callbacks.get(value_name)).json())
+				data["values"][value_name].append(UnitValue(value, repr_callback = repr_callbacks.get(value_name)).to_dict())
 		return data
