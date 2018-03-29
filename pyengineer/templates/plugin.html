@@ -18,12 +18,18 @@ function submit_data(uri) {
 		dataType: "html",
 		success: function(result) {
 			$("#response").html(result);
+		},
+		error: function(result) {
+			console.log(result);
+			$("#response").html("<div class='alert alert-danger' role='alert'>The HTTP request failed: (HTTP " + result.status + " -- " + result.statusText + ")<br />More info in the JavaScript console.</div>");
 		}
 	})
 }
 </script>
 
+<div class="container mb-4">
 ${rendered_form_html}
+</div>
 
-<div id="response">
+<div class="container" id="response">
 </div>

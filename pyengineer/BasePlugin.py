@@ -25,6 +25,8 @@ class BasePlugin(object):
 	_ID = None
 	_TITLE = None
 	_MENU_HIERARCHY = None
+	_FORM_TEMPLATE = None
+	_RESPONSE_TEMPLATE = None
 	__FORM_TEMPLATE_PREFIX = "<%namespace file=\"plugin_form_lib.html\" import=\"*\" />\n"
 	__RESPONSE_TEMPLATE_PREFIX = "<%namespace file=\"plugin_response_lib.html\" import=\"*\" />\n<%inherit file=\"plugin_response_base.html\" />\n"
 
@@ -71,16 +73,16 @@ class BasePlugin(object):
 		return self._MENU_HIERARCHY
 
 	@property
-	def config(self):
-		return self._config
-
-	@property
 	def form_template(self):
-		return "Template source undefined in derived class."
+		return self._FORM_TEMPLATE
 
 	@property
 	def response_template(self):
-		return None
+		return self._RESPONSE_TEMPLATE
+
+	@property
+	def config(self):
+		return self._config
 
 	def render_response(self, response):
 		if self._response_template is None:
