@@ -9,15 +9,13 @@ _form_template = """
 """
 
 _response_template = """
-That's da response
-
-${r["data"]["value_fmt"]}
+${"%.3f" % (d["value"])} = ${"%.2e" % (d["value"])} = ${d["value_fmt"]}
 """
 
 class Plugin(BasePlugin):
 	_ID = "5583023c-88de-4eb3-b8ba-bcae6edfff14"
 	_TITLE = "Deunify"
-	_MENU_HIERARCHY = ("Simple Stuff", "Deunify")
+	_MENU_HIERARCHY = ("Basics", "Deunify")
 	_FORM_TEMPLATE = _form_template
 	_RESPONSE_TEMPLATE = _response_template
 

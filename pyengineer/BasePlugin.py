@@ -37,6 +37,7 @@ class BasePlugin(object):
 		self._config = configuration
 		variables = {
 			"request_uri":	self.__request_uri,
+			"title":		self.plugin_title,
 		}
 
 		# Render the request handler completely now
@@ -88,4 +89,8 @@ class BasePlugin(object):
 		if self._response_template is None:
 			return "No response renderer defined in derived class.\n"
 		else:
-			return self._response_template.render(r = response)
+			variables = {
+				"r":	response,
+				"d":	response.get("data"),
+			}
+			return self._response_template.render(**variables)

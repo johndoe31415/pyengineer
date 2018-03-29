@@ -88,11 +88,11 @@ class GUIApplication(object):
 		self._app.add_url_rule("/config", "config", self._serve_config)
 		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>", "plugin_index", self._serve_plugin_index)
 		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>/<endpoint>", "plugin_request", self._serve_plugin_request, methods = [ "POST" ])
-		self._load_module("SimpleDeunify.py")
+		self._load_plugin("SimpleDeunify.py")
 		self._menu.dump()
 
-	def _load_module(self, python_filename):
-		module = importlib.machinery.SourceFileLoader("plugin_module", python_filename).load_module()
+	def _load_plugin(self, python_filename):
+		module = importlib.machinery.SourceFileLoader("plugin_module", python_filename).load_plugin()
 		plugin_class = module.Plugin
 		instance = plugin_class(self._config)
 		self._plugins[instance.plugin_id] = instance
@@ -115,6 +115,7 @@ class GUIApplication(object):
 	def _serve_plugin_index(self, plugin_uuid):
 		instance = self._plugins[str(plugin_uuid)]
 		variables = {
+			"title":				instance.plugin_title,
 			"rendered_form_html":	instance.rendered_form_html,
 		}
 		return self._serve("plugin.html", variables)
