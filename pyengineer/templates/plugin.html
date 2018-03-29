@@ -3,16 +3,23 @@
 <script>
 function submit_data(uri) {
 	const submit_data_array = $("#input_data").serializeArray();
-	console.log(submit_data_array);
 
-	var submit_data = { };
+	let submit_data = { };
 	$(submit_data_array).each(function(index, obj) {
-	    submit_data[obj.name] = obj.value;
+		submit_data[obj.name] = obj.value;
 	});
-	
-	console.log(submit_data);
+	const submit_data_json = JSON.stringify(submit_data, null, 2);
 
-	$.post(uri, alert);
+	$.ajax({
+		url: uri,
+		type: "POST",
+		data: submit_data_json,
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(result) {
+			show_result(result);
+		}
+	})
 }
 </script>
 

@@ -25,6 +25,7 @@ class BasePlugin(object):
 	_ID = None
 	_TITLE = None
 	_MENU_HIERARCHY = None
+	__RESPONSE_TEMPLATE_PREFIX = ""
 	__TEMPLATE_PREFIX = "<%namespace file=\"plugin_content.html\" import=\"*\" />\n"
 
 	def __init__(self, configuration):
@@ -36,6 +37,10 @@ class BasePlugin(object):
 			"request_uri":	self.__request_uri,
 		}
 		self._html = LocalTemplateLookup().create(self.__TEMPLATE_PREFIX + self.template_source).render(**variables)
+		if self.response_source is not None:
+			self._response_template = LocalTemplateLookup().create(self.__RESPONSE_TEMPLATE_PREFIX + self.response_source)
+		else:
+			self._response_template = None
 
 	def __request_uri(self, endpoint = None):
 		if endpoint is None:
@@ -66,3 +71,8 @@ class BasePlugin(object):
 	def template_source(self):
 		return "Template source undefined in derived class."
 
+	def response_renderer(self, response):
+		if self._response_template is None:
+			return "No response renderer defined in derived class.\n"
+		else:
+			return self._response_template.render(r = response)

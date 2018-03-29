@@ -11,6 +11,6 @@
 		%endif
 	</div>
 </%def>
-<%def name="submit_button(button_text)">
-	<button onclick="submit_data(); return false" class="btn btn-primary">${button_text}</button>
+<%def name="submit_button(button_text, endpoint = None)">
+	<button onclick="submit_data('${request_uri(endpoint)}'); return false" class="btn btn-primary">${button_text}</button>
 </%def>

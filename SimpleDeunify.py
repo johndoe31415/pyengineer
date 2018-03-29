@@ -4,7 +4,7 @@ _template_source = """
 
 <script>
 function show_result(response) {
-
+	alert(response);
 }
 </script>
 
@@ -12,9 +12,12 @@ function show_result(response) {
 	${input_text("input_value", "Input value")}
 	${submit_button("Calculate")}
 </form>
+"""
 
+_response_source = """
+That's da response
 
-
+${r["data"]["value_fmt"]}
 """
 
 class Plugin(BasePlugin):
@@ -23,11 +26,19 @@ class Plugin(BasePlugin):
 	_MENU_HIERARCHY = ("Simple Stuff", "Deunify")
 
 	def request(self, endpoint, parameters):
-		return { "output": float(UnitValue(parameters["input"])) }
+		value = UnitValue(parameters["input_value"])
+		return {
+			"value":		float(value),
+			"value_fmt":	value.format(),
+		}
 
 	@property
 	def template_source(self):
 		return _template_source
+
+	@property
+	def response_source(self):
+		return _response_source
 
 if __name__ == "__main__":
 	from pyengineer import Configuration

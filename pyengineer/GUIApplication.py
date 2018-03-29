@@ -21,6 +21,7 @@
 
 import os
 import flask
+import traceback
 import importlib.machinery
 from mako.lookup import TemplateLookup
 
@@ -77,7 +78,7 @@ class MenuHierarchy(object):
 
 class GUIApplication(object):
 	def __init__(self, config):
-		self._modules = { }
+		self._plugins = { }
 		self._menu = MenuHierarchy()
 		self._config = config
 		template_dir = os.path.dirname(__file__) + "/templates"
@@ -86,15 +87,15 @@ class GUIApplication(object):
 		self._app.add_url_rule("/", "index", self._serve_index)
 		self._app.add_url_rule("/config", "config", self._serve_config)
 		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>", "plugin_index", self._serve_plugin_index)
+		self._app.add_url_rule("/plugins/<uuid:plugin_uuid>/<endpoint>", "plugin_request", self._serve_plugin_request, methods = [ "POST" ])
 		self._load_module("SimpleDeunify.py")
-		self._load_module("SimpleDeunify2.py")
 		self._menu.dump()
 
 	def _load_module(self, python_filename):
 		module = importlib.machinery.SourceFileLoader("plugin_module", python_filename).load_module()
 		plugin_class = module.Plugin
 		instance = plugin_class(self._config)
-		self._modules[instance.plugin_id] = instance
+		self._plugins[instance.plugin_id] = instance
 		self._menu.register(instance.plugin_menu_hierarchy, instance)
 
 	def _serve(self, template_name, variables = None):
@@ -112,11 +113,53 @@ class GUIApplication(object):
 		return self._serve("index.html")
 
 	def _serve_plugin_index(self, plugin_uuid):
-		instance = self._modules[str(plugin_uuid)]
+		instance = self._plugins[str(plugin_uuid)]
 		variables = {
 			"plugin_content":		instance.html,
 		}
 		return self._serve("plugin.html", variables)
+
+	def _serve_plugin_request(self, plugin_uuid, endpoint):
+		instance = self._plugins[str(plugin_uuid)]
+		if "Accept" not in flask.request.headers:
+			return flask.jsonify({
+				"status":		"failed",
+				"errorcode":	"NoAcceptHeader",
+				"description":	"No 'Accept' header set.",
+			})
+
+		if flask.request.headers["Accept"] == "application/json":
+			renderer = flask.jsonify
+		elif flask.request.headers["Accept"] == "text/html":
+			renderer = instance.response_renderer
+		else:
+			return flask.jsonify({
+				"status":		"failed",
+				"errorcode":	"UnknownAcceptHeader",
+				"description":	"'Accept' header must be either application/json or text/html, but was '%s'." % (flask.request.headers["Accept"]),
+			})
+
+		input_data = flask.request.json
+		if input_data is None:
+			return renderer({
+				"status":		"failed",
+				"errorcode":	"JSONInputWasNone",
+				"description":	"No JSON input provided.",
+			})
+		try:
+			result = instance.request(endpoint, flask.request.json)
+		except (KeyError, ValueError) as e:
+			print(traceback.format_exc())
+			return renderer({
+				"status":		"exception",
+				"errorcode":	e.__class__.__name__,
+				"description":	str(e),
+			})
+
+		return renderer({
+			"status":		"ok",
+			"data":			result,
+		})
 
 	def _serve_config(self):
 		return flask.jsonify(self._config.get_data())
