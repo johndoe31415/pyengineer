@@ -100,8 +100,6 @@ class Plugin(BasePlugin):
 			"diameter_err":		(candidate.diameter - float(diameter)) / float(diameter),
 			"pitch_err":		(candidate.pitch - pitch) / pitch,
 		} for candidate in candidates ]
-		for candidate in candidates:
-			print(candidate)
 
 		return {
 			"diameter":			diameter.to_dict(),
