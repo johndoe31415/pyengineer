@@ -1,15 +1,19 @@
 <!doctype html>
-<%def name="render_menu(menu)">
+<%def name="render_menu(node)">
+%if node.has_children:
 <ul class="navbar-nav mr-auto">
 	<li class="nav-item dropdown">
-		<a class="nav-link dropdown-toggle" href="#" id="${menu.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${menu.name}</a>
-		<div class="dropdown-menu" aria-labelledby="${menu.id}">
-%for (plugin_name, plugin) in menu.entries:
-	<a class="dropdown-item" href="/plugins/${plugin.plugin_id}">${plugin_name}</a>
-%endfor
+		<a class="nav-link dropdown-toggle" href="#" id="${node.node_hash}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${node.name}</a>
+		<div class="dropdown-menu" aria-labelledby="${node.node_hash}">
+		%for child in node:
+			${render_menu(child)}
+		%endfor
 		</div>
 	</li>
 </ul>
+%else:
+	<a class="dropdown-item" href="/plugins/${node.data.plugin_id}">${node.name}</a>
+%endif
 </%def>
 <html>
 	<head>
@@ -33,8 +37,8 @@
 			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 
 				<ul class="navbar-nav mr-auto">
-					%for submenu in menu.submenus:
-						${render_menu(submenu)}
+					%for node in menu:
+						${render_menu(node)}
 					%endfor
 				</ul>
 			</div>

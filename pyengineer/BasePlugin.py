@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import uuid
 from pyengineer import LocalTemplateLookup
 
 class BasePlugin(object):
@@ -30,11 +31,12 @@ class BasePlugin(object):
 	__FORM_TEMPLATE_PREFIX = "<%namespace file=\"plugin_form_lib.html\" import=\"*\" />\n"
 	__RESPONSE_TEMPLATE_PREFIX = "<%namespace file=\"plugin_response_lib.html\" import=\"*\" />\n<%inherit file=\"plugin_response_base.html\" />\n"
 
-	def __init__(self, configuration):
+	def __init__(self, configuration, instanciated_from):
 		assert(isinstance(self._ID, str))
 		assert(isinstance(self._TITLE, str))
 		assert(isinstance(self._MENU_HIERARCHY, tuple))
-		self._config = configuration
+		self.__config = configuration
+		self.__instanciated_from = instanciated_from
 		variables = {
 			"request_uri":	self.__request_uri,
 			"title":		self.plugin_title,
@@ -55,15 +57,19 @@ class BasePlugin(object):
 	def __request_uri(self, endpoint = None):
 		if endpoint is None:
 			endpoint = "default"
-		return "/plugins/" + self.plugin_id + "/" + endpoint
+		return "/plugins/" + str(self.plugin_id) + "/" + endpoint
 
 	@property
 	def rendered_form_html(self):
 		return self._rendered_form_html
 
 	@property
+	def instanciated_from(self):
+		return self.__instanciated_from
+
+	@property
 	def plugin_id(self):
-		return self._ID
+		return uuid.UUID(self._ID)
 
 	@property
 	def plugin_title(self):
@@ -83,7 +89,7 @@ class BasePlugin(object):
 
 	@property
 	def config(self):
-		return self._config
+		return self.__config
 
 	def render_response(self, response):
 		if self._response_template is None:
@@ -94,3 +100,6 @@ class BasePlugin(object):
 				"d":	response.get("data"),
 			}
 			return self._response_template.render(**variables)
+
+	def __str__(self):
+		return "Plugin<%s / %s from %s>" % (self.plugin_title, self.plugin_id, self.instanciated_from)

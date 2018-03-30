@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from .MenuTests import MenuTests
 from .UnitValueTests import UnitValueTests
 from .ESeriesTests import ESeriesTests
 from .ThreadsTests import ThreadsTests

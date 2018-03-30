@@ -24,7 +24,6 @@ class GeneralException(Exception): pass
 class InvalidThreadDefinitionException(GeneralException): pass
 class InputDataException(GeneralException): pass
 
-class DuplicatePluginIDException(GeneralException): pass
 class DuplicateEntryException(GeneralException): pass
 class DataMissingException(GeneralException): pass
 class InvalidDataException(GeneralException): pass

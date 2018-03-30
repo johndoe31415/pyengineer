@@ -62,6 +62,13 @@ class ValueSet(object):
 		if larger is not None:
 			yield larger
 
+	def iter_range(self, min_value, max_value):
+		min_index = bisect.bisect(self._values, UnitValue(min_value)) - 1
+		max_index = bisect.bisect(self._values, UnitValue(max_value))
+		for index in range(min_index, max_index + 1):
+			if 0 <= index < len(self._values):
+				yield self._values[index]
+
 	@classmethod
 	def from_dict(cls, dict_data):
 		if not "name" in dict_data:
