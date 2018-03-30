@@ -1,5 +1,5 @@
 # pyengineer
-![Logo](https://raw.githubusercontent.com/johndoe31415/pyengineer/master/pyengineer/static/wrench_rotated.svg)
+![Logo](https://raw.githubusercontent.com/johndoe31415/pyengineer/master/docs/logo.png)
 pyengineer is a collection of scripts that are useful for electronics or
 hardware design. It is a wsgi-enabled Python application and has a GUI in your
 browser. The idea is that you can adapt the software to your workshop; for
