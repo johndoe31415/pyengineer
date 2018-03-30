@@ -21,7 +21,8 @@
 
 import json
 import collections
-from pyengineer import UnitValue
+import pkgutil
+from pyengineer import UnitValue, ThreadDB
 from pyengineer.ValueSets import ValueSets
 
 class Configuration(object):
@@ -34,6 +35,14 @@ class Configuration(object):
 			self._valuesets[group] = ValueSets.from_dict(valuesets_data)
 
 		self._config_dict = self._create_dict()
+
+		self._thread_db = ThreadDB()
+		database_data = json.loads(pkgutil.get_data("pyengineer.data", "threads.json").decode("utf-8"))
+		self._thread_db.add_groups_by_definition(database_data)
+
+	@property
+	def thread_db(self):
+		return self._thread_db
 
 	def to_dict(self):
 		return self._config_dict

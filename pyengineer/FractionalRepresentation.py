@@ -71,6 +71,10 @@ class FractionalRepresentation(object):
 	def fractional_error(self):
 		return self._fractional_error
 
+	@property
+	def is_zero(self):
+		return (self.whole, self.numerator) == (0, 0)
+
 	def __float__(self):
 		sign = -1 if self.negative else 1
 		return sign * (self.whole + (self.numerator / self.denominator))
