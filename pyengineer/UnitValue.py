@@ -55,7 +55,10 @@ class UnitValue(object):
 						exponent = si_exponent
 						value = value[:-len(si_prefix)]
 						break
-			self._value = Fraction(value) * (10 ** exponent)
+			if exponent > 0:
+				self._value = Fraction(value) * (10 ** exponent)
+			else:
+				self._value = Fraction(value) / (10 ** -exponent)
 		if self._repr_callback is None:
 			self._repr_callback = lambda value: value.raw_value
 
@@ -84,7 +87,10 @@ class UnitValue(object):
 			mantissa = float(value)
 		else:
 			for (si_prefix, si_exponent) in self._SI_PREFIXES:
-				mantissa = float(value / (10 ** si_exponent))
+				if si_exponent > 0:
+					mantissa = value / (10 ** si_exponent)
+				else:
+					mantissa = value * (10 ** -si_exponent)
 				if 1 <= mantissa < 1000:
 					break
 			else:

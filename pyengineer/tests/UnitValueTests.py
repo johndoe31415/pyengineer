@@ -117,3 +117,7 @@ class UnitValueTests(unittest.TestCase):
 
 		y = UnitValue(x)
 		self.assertEqual(x, y)
+
+	def test_reformat_1u(self):
+		value = UnitValue("1u")
+		self.assertEqual(value.format(significant_digits = 3), "1.00 µ")
