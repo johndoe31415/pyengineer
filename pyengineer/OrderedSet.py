@@ -19,12 +19,37 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .OrderedSet import OrderedSet
-from .UnitValue import UnitValue
-from .ESeries import ESeries
-from .Threads import Thread, ThreadDB
-from .Exceptions import GeneralException, InputDataException
-from .Configuration import Configuration
-from .GUIApplication import GUIApplication
-from .LocalTemplateLookup import LocalTemplateLookup
-from .BasePlugin import BasePlugin
+class OrderedSet(object):
+	def __init__(self):
+		self._ordered_tuple = tuple()
+		self._sorted_tuple = tuple()
+		self._set = set()
+
+	def add_items(self, items):
+		new_item_list = list(self._ordered_tuple)
+		for item in items:
+			if item not in self._set:
+				self._set.add(item)
+				new_item_list.append(item)
+		self._ordered_tuple = tuple(new_item_list)
+		self._sorted_tuple = tuple(sorted(new_item_list))
+
+	def add_item(self, item):
+		return self.add_items([ item ])
+
+	@property
+	def ordered_tuple(self):
+		return self._ordered_tuple
+
+	@property
+	def sorted_tuple(self):
+		return self._sorted_tuple
+
+	def __getitem__(self, index):
+		return self._sorted_tuple[index]
+
+	def __len__(self):
+		return len(self._sorted_tuple)
+
+	def __iter__(self):
+		return iter(self.sorted_tuple)

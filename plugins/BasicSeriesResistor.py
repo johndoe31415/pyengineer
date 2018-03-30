@@ -27,7 +27,7 @@ _form_template = """
 	${input_text("v_load", "Load Voltage", righthand_side = "V")}
 	${input_text("i", "Current", righthand_side = "A")}
 	${input_text("r_user", "Custom resistor choice", righthand_side = "Ω", optional = True)}
-	${input_set("r_set", "r", "Resistor set", empty_value = "None", optional = True)}
+	${input_set("r_set", "Resistor set", valueset_group_name = "r", empty_value = "None", optional = True)}
 	${submit_button("Calculate")}
 </form>
 """

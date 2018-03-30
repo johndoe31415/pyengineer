@@ -24,7 +24,7 @@ from pyengineer import BasePlugin, UnitValue, InputDataException
 
 _form_template = """
 <form id="input_data">
-	${input_values("f_std", "frequencies", "CPU Frequency", empty_value = "Custom", suffix = "Hz")}
+	${input_set("f_std", "CPU Frequency", valueset_group_name = "frequency", valueset_name = "Crystals", empty_value = "Custom")}
 	${input_text("f_user", "Custom CPU Frequency", righthand_side = "Hz")}
 	${input_checkbox("ckdiv8", "Divide clock by 8 (CKDIV8)")}
 	${input_checkbox("u2x", "Double speed (U2X)")}
@@ -67,7 +67,7 @@ class Plugin(BasePlugin):
 		ckdivisor = 8 if u2x else 16
 
 		result_items = [ ]
-		for baudrate in self.config.iter_values("baudrates"):
+		for baudrate in self.config.get_valuesets("baudrate")["Standard"].values.ordered_tuple:
 			ubrr = max(0, round(float(f) / (ckdivisor * float(baudrate))) - 1)
 			act_baudrate = float(f) / (ckdivisor * (ubrr + 1))
 			error = (act_baudrate - float(baudrate)) / float(baudrate)

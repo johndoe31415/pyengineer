@@ -39,24 +39,24 @@ class UnitValue(object):
 	)
 
 	def __init__(self, value, repr_callback = None):
+		self._repr_callback = repr_callback
 		if isinstance(value, UnitValue):
-			value = value._value
-
-		self._raw_value = value
-
-		# Unit specified?
-		exponent = 0
-		if isinstance(value, str):
-			value = value.rstrip("\t\n ")
-			for (si_prefix, si_exponent) in self._SI_PREFIXES:
-				if value.endswith(si_prefix):
-					exponent = si_exponent
-					value = value[:-len(si_prefix)]
-					break
-		self._value = Fraction(value) * (10 ** exponent)
-		if repr_callback is not None:
-			self._repr_callback = repr_callback
+			self._value = value._value
+			self._raw_value = value._raw_value
 		else:
+			self._raw_value = value
+
+			# Unit specified?
+			exponent = 0
+			if isinstance(value, str):
+				value = value.rstrip("\t\n ")
+				for (si_prefix, si_exponent) in self._SI_PREFIXES:
+					if value.endswith(si_prefix):
+						exponent = si_exponent
+						value = value[:-len(si_prefix)]
+						break
+			self._value = Fraction(value) * (10 ** exponent)
+		if self._repr_callback is None:
 			self._repr_callback = lambda value: value.raw_value
 
 	@property
@@ -108,13 +108,15 @@ class UnitValue(object):
 			unit_str = si_prefix
 		return "%s%.*f %s" % (sign, post_decimal, mantissa, unit_str)
 
-	def to_dict(self, significant_digits = 3):
-		return {
+	def to_dict(self, significant_digits = 3, include_raw = False):
+		result = {
 			"flt":		float(self),
-			"raw":		self.raw_value,
 			"fmt":		self.format(significant_digits = significant_digits),
 			"repr":		self.representation,
 		}
+		if include_raw:
+			result["raw"] = self.raw_value
+		return result
 
 	def __ge__(self, other):
 		return self._value >= other._value

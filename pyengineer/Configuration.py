@@ -29,39 +29,37 @@ class Configuration(object):
 		with open(json_filename, "r") as f:
 			self._raw_config = json.loads(f.read())
 
-		self._sets = { }
-		for (set_group, sets_data) in self._raw_config["sets"].items():
-			self._sets[set_group] = ValueSets.from_dict(sets_data)
+		self._valuesets = { }
+		for (group, valuesets_data) in self._raw_config["valuesets"].items():
+			self._valuesets[group] = ValueSets.from_dict(valuesets_data)
 
-		self._values = collections.defaultdict(list)
-		for (value_group, values_data) in self._raw_config["values"].items():
-			for value_data in values_data:
-				self._values[value_group].append(UnitValue(value_data))
+		self._config_dict = self._create_dict()
 
-	def iter_values(self, valuegroup_name):
-		return iter(self._values[valuegroup_name])
+	def to_dict(self):
+		return self._config_dict
 
-	def get_valuesets(self, valueset_group):
-		return self._sets[valueset_group]
+	def _create_dict(self):
+		data = {
+			"valuesets": { },
+		}
+		repr_callbacks = {
+			"frequency":	lambda value: value.format(significant_digits = 6),
+			"r":			lambda value: value.format(significant_digits = 3),
+			"c":			lambda value: value.format(significant_digits = 3),
+			"l":			lambda value: value.format(significant_digits = 3),
+		}
+		for (group, valuesets) in self._valuesets.items():
+			data["valuesets"][group] = [ ]
+			for valueset in valuesets:
+				data["valuesets"][group].append(valueset.to_dict(repr_callback = repr_callbacks.get(group)))
+		return data
+
+	def get_valuesets(self, group):
+		if group not in self._valuesets:
+			raise KeyError("No such ValueSet: %s" % (group))
+		return self._valuesets[group]
 
 	@property
 	def plugin_directory(self):
 		# TODO: Hardcoded for now
 		return "plugins"
-
-	def to_dict(self):
-		data = {
-			"sets": collections.defaultdict(list),
-			"values": collections.defaultdict(list),
-		}
-		for (set_name, sets) in self._raw_config["sets"].items():
-			for specific_set in sets:
-				data["sets"][set_name].append(specific_set["name"])
-
-		repr_callbacks = {
-			"frequencies":	lambda value: value.format(significant_digits = 6),
-		}
-		for (value_name, values) in self._raw_config["values"].items():
-			for value in values:
-				data["values"][value_name].append(UnitValue(value, repr_callback = repr_callbacks.get(value_name)).to_dict())
-		return data

@@ -40,25 +40,38 @@ $.ajax({
 	type: "GET",
 	dataType: "json",
 	success: function(result) {
-		$(".populate_input_set").each(function() {
+		$(".populate_valueset").each(function() {
 			const combobox_element = $(this);
-			const set_name = combobox_element.attr("set_name");
-			for (let i in result.sets[set_name]) {
-				let name = result.sets[set_name][i];
-				combobox_element.append(new Option(name, name));
+			const valueset_group = combobox_element.attr("valueset_group");
+			const valueset_name = combobox_element.attr("valueset_name");
+			if (valueset_name === undefined) {
+				/* Populate combobox with names of groups */
+				for (let i in result.valuesets[valueset_group]) {
+					let valueset = result.valuesets[valueset_group][i];
+					combobox_element.append(new Option(valueset["name"], valueset["name"]));
+				}
+			} else {
+				/* Populate combobox with values inside a specific group */
+				const valuesets = result.valuesets[valueset_group];
+				let valueset = null;
+				for (let i in valuesets) {
+					if (valuesets[i]["name"] == valueset_name) {
+						valueset = valuesets[i];
+						break;
+					}
+				}
+				if (valueset === null) {
+					console.log("Warning: No valueset named '" + valueset_name + "' in valueset group '" + valueset_group + "' -- not populating combobox: ", combobox_element)
+				} else {
+					console.log(valueset_group, valueset_name);
+					console.log(valueset);
+					for (let i in valueset["values"]) {
+						let value = valueset["values"][i];
+						combobox_element.append(new Option(value["repr"], value["repr"]));
+					}
+				}
 			}
 		});
-
-		$(".populate_input_values").each(function() {
-			const combobox_element = $(this);
-			const values_name = combobox_element.attr("values_name");
-			const values_suffix = combobox_element.attr("values_suffix");
-			for (let i in result.values[values_name]) {
-				let name = result.values[values_name][i]["repr"] + values_suffix;
-				combobox_element.append(new Option(name, result.values[values_name][i]["raw"]));
-			}
-		});
-
 	},
 	error: function(result) {
 		console.log("Couldn't fetch configuration JSON.");

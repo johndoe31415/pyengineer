@@ -20,18 +20,27 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import bisect
-from pyengineer import UnitValue, ESeries
+from pyengineer import UnitValue, ESeries, OrderedSet
 from pyengineer.Exceptions import DuplicateEntryException, DataMissingException, InvalidDataException
 
 class ValueSet(object):
 	def __init__(self, name, values, additional_data = None):
 		self._name = name
+		self._values = OrderedSet()
 		if values is not None:
-			self._values = tuple(sorted(set(values)))
+			self._values.add_items(values)
 			self._resolved = True
 		else:
 			self._resolved = False
 		self._additional_data = additional_data
+
+	@property
+	def name(self):
+		return self._name
+
+	@property
+	def values(self):
+		return self._values
 
 	def find_closest(self, value):
 		value = UnitValue(value)
@@ -45,10 +54,6 @@ class ValueSet(object):
 		else:
 			larger = None
 		return (smaller, larger)
-
-	@property
-	def name(self):
-		return self._name
 
 	@classmethod
 	def from_dict(cls, dict_data):
@@ -81,11 +86,11 @@ class ValueSet(object):
 		else:
 			raise InvalidDataException("Invalid 'type' attribute of ValueSet '%s': %s" % (vs_type, str(dict_data)))
 
-	def __iter__(self):
-		return iter(self._values)
-
-	def __len__(self):
-		return len(self._values)
+	def to_dict(self, repr_callback = None):
+		return {
+			"name":		self.name,
+			"values":	[ UnitValue(element, repr_callback = repr_callback).to_dict() for element in self._values ],
+		}
 
 	@property
 	def resolved(self):
@@ -94,11 +99,15 @@ class ValueSet(object):
 	def resolve(self, valuesets):
 		if self.resolved:
 			return
-		values = set()
 		for group_name in self._additional_data:
-			values |= set(valuesets[group_name])
-		self._values = tuple(sorted(values))
+			self._values.add_items(valuesets[group_name])
 		self._resolved = True
+
+	def __iter__(self):
+		return iter(self._values)
+
+	def __len__(self):
+		return len(self._values)
 
 class ValueSets(object):
 	def __init__(self):

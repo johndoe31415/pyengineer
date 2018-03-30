@@ -12,28 +12,14 @@
 	</div>
 </%def>
 
-<%def name="input_set(field_name, set_name, field_desc, empty_value = None, optional = False)">
+<%def name="input_set(field_name, field_desc, valueset_group_name, valueset_name = None, empty_value = None, optional = False)">
 	<div class="form-group row">
 		<label for="${field_name}" class="col-2 col-form-label${" text-secondary" if optional else ""}">${field_desc}:</label>
 		<div class="col-4">
-			<select id="${field_name}" name="${field_name}" class="form-control populate_input_set" set_name="${set_name}">
+			<select id="${field_name}" name="${field_name}" class="form-control populate_valueset" valueset_group="${valueset_group_name}"${' valueset_name="%s"' % (valueset_name) if (valueset_name is not None) else ''}>
 				%if empty_value is not None:
 				<option value="">${empty_value}</option>
 				%endif
-			</select>
-		</div>
-	</div>
-</%def>
-
-<%def name="input_values(field_name, set_name, field_desc, empty_value = None, optional = False, suffix = '')">
-	<div class="form-group row">
-		<label for="${field_name}" class="col-2 col-form-label${" text-secondary" if optional else ""}">${field_desc}:</label>
-		<div class="col-4">
-			<select id="${field_name}" name="${field_name}" class="form-control populate_input_values" values_name="${set_name}" values_suffix="${suffix}">
-				%if empty_value is not None:
-				<option value="">${empty_value}</option>
-				%endif
-				$suffix
 			</select>
 		</div>
 	</div>
