@@ -55,6 +55,13 @@ class ValueSet(object):
 			larger = None
 		return (smaller, larger)
 
+	def iter_closest(self, value):
+		(smaller, larger) = self.find_closest(value)
+		if smaller is not None:
+			yield smaller
+		if larger is not None:
+			yield larger
+
 	@classmethod
 	def from_dict(cls, dict_data):
 		if not "name" in dict_data:
