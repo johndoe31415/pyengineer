@@ -40,7 +40,7 @@ $.ajax({
 	type: "GET",
 	dataType: "json",
 	success: function(result) {
-		$(".populate_valueset").each(function() {
+		$(".populate_valueset").forEach(function() {
 			const combobox_element = $(this);
 			const valueset_group = combobox_element.attr("valueset_group");
 			const valueset_name = combobox_element.attr("valueset_name");

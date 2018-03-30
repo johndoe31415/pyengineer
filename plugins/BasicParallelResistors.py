@@ -23,7 +23,7 @@ from pyengineer import BasePlugin, UnitValue, InputDataException
 
 _form_template = """
 <form id="input_data">
-	${input_text("r", "Resistor", righthand_side = "Ω", optional = True)}
+	${input_text("r", "Resistor", righthand_side = "Ω")}
 	${input_set("r_set", "Resistor set", valueset_group_name = "r")}
 	${submit_button("Calculate")}
 </form>
