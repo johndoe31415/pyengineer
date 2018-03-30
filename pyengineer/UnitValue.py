@@ -21,6 +21,7 @@
 
 import enum
 import math
+import collections
 from fractions import Fraction
 
 class UnitValue(object):
@@ -114,7 +115,7 @@ class UnitValue(object):
 			unit_str = si_prefix
 		return "%s%.*f %s" % (sign, post_decimal, mantissa, unit_str)
 
-	def to_dict(self, significant_digits = 3, include_raw = False):
+	def to_dict(self, significant_digits = 3, include_raw = False, include_fractional = False):
 		result = {
 			"flt":		float(self),
 			"fmt":		self.format(significant_digits = significant_digits),
@@ -122,6 +123,8 @@ class UnitValue(object):
 		}
 		if include_raw:
 			result["raw"] = self.raw_value
+		if include_fractional:
+			result["fractional"] = self.get_fractional()
 		return result
 
 	def __ge__(self, other):

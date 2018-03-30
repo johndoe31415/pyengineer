@@ -23,3 +23,4 @@ from .UnitValueTests import UnitValueTests
 from .ESeriesTests import ESeriesTests
 from .ThreadsTests import ThreadsTests
 from .ValueSetTests import ValueSetTests
+from .FractionalRepresentationTests import FractionalRepresentationTests

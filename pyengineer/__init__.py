@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from .FractionalRepresentation import FractionalRepresentation
 from .OrderedSet import OrderedSet
 from .UnitValue import UnitValue
 from .ESeries import ESeries
