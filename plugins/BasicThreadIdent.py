@@ -116,4 +116,4 @@ class Plugin(BasePlugin):
 if __name__ == "__main__":
 	from pyengineer import Configuration
 	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "input_value": "123.456k", "significant_digits": "4" }))
+	print(Plugin(config).request("calc", { "diameter": "3.05m", "length": "5m", "turns": "8" }))
