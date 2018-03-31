@@ -67,9 +67,8 @@ class Plugin(BasePlugin):
 					"error":	error,
 				})
 		options.sort(key = lambda opt: abs(opt["error"]))
-
 		return {
-			"options": options,
+			"options": options[ : 20],
 		}
 
 
