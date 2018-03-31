@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyengineer import BasePlugin, UnitValue
+from pyengineer import BasePlugin, UnitValue, InputDataException
 
 _form_template = """
 <form id="input_data">
@@ -31,18 +31,24 @@ _form_template = """
 _response_template = """
 ${result_table_begin("Component Type", "Value")}
 
+%if d["r"] is not None:
 <tr>
 	<td>Resistor:</td>
 	<td>${d["r"]["fmt"]}Ω</td>
 </tr>
+%endif
+%if d["c"] is not None:
 <tr>
 	<td>Capacitor:</td>
 	<td>${d["c"]["fmt"]}F</td>
 </tr>
+%endif
+%if d["l"] is not None:
 <tr>
 	<td>Inductor:</td>
 	<td>${d["l"]["fmt"]}H</td>
 </tr>
+%endif
 
 ${result_table_end()}
 """
@@ -55,14 +61,41 @@ class Plugin(BasePlugin):
 	_RESPONSE_TEMPLATE = _response_template
 
 	def request(self, endpoint, parameters):
-		marking = int(parameters["marking"])
-		(base, exponent) = divmod(marking, 10)
-		value = base * (10 ** exponent)
+		marking = parameters["marking"].strip()
+		try:
+			int_marking = int(marking)
+		except ValueError:
+			int_marking = None
+		try:
+			flt_marking = float(marking)
+		except ValueError:
+			flt_marking = None
+
+		if (int_marking is not None) and (int_marking >= 100):
+			(base, exponent) = divmod(int_marking, 10)
+			value = base * (10 ** exponent)
+			(r, c, l) = (1, 1e-12, 1e-6)
+		elif flt_marking is not None:
+			value = flt_marking
+			(r, c, l) = (1, 1e-12, None)
+		else:
+			replacers = {
+				"r":	(1,		None,	1e-6),
+				"u":	(None,	1e-6,	1e-6),
+				"n":	(None,	1e-9,	1e-9),
+				"p":	(None,	1e-12,	None),
+			}
+			lmarking = marking.lower()
+			for (character, (r, c, l)) in replacers.items():
+				if character in lmarking:
+					value = float(lmarking.replace(character, "."))
+					break
+			else:
+				raise InputDataException("Unable to interpret \"%s\"." % (marking))
 		return {
-			"marking": marking,
-			"r":		UnitValue(value).to_dict(),
-			"c":		UnitValue(value * 1e-12).to_dict(),
-			"l":		UnitValue(value * 1e-6).to_dict(),
+			"r":		UnitValue(value * r).to_dict() if r else None,
+			"c":		UnitValue(value * c).to_dict() if c else None,
+			"l":		UnitValue(value * l).to_dict() if l else None,
 		}
 
 
