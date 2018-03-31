@@ -23,7 +23,7 @@ from pyengineer import BasePlugin, UnitValue
 
 _form_template = """
 <form id="input_data">
-	${input_text("v_out", "Input Voltage", righthand_side = "V")}
+	${input_text("v_out", "Output Voltage", righthand_side = "V")}
 	${input_set("r_set", "Resistor set", valueset_group_name = "r")}
 	${submit_button("Calculate")}
 </form>
@@ -68,7 +68,7 @@ class Plugin(BasePlugin):
 				})
 		options.sort(key = lambda opt: abs(opt["error"]))
 		return {
-			"options": options[ : 20],
+			"options": options[ : 15 ],
 		}
 
 
