@@ -101,5 +101,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "marking": "4702" }))
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "marking": "4702" })
