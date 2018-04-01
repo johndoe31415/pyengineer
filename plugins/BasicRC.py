@@ -105,6 +105,7 @@ class Plugin(BasePlugin):
 			# (t2 - t1) / tau = ln(v1 / v2)
 			# tau = (t2 - t1) / ln(v1 / v2)
 			tau = (float(t2) - float(t1)) / math.log(float(v1) / float(v2))
+			v0 = float(v1) / math.exp(-float(t1) / tau)
 		else:
 			# Capacitor is charging, here we need to rely on numeric solution.
 			# v(t) = v0 * (1 - exp(-t / tau))
@@ -121,10 +122,7 @@ class Plugin(BasePlugin):
 				tau = NewtonSolver(function).solve(x0 = 1)
 			except ZeroDivisionError:
 				raise InputDataException("Result is numerically instable, cannot solve.")
-
-		# In either case:
-		# v0 = v1 / exp(-t1 / tau)
-		v0 = float(v1) / math.exp(-float(t1) / tau)
+			v0 = float(v1) / (1 - math.exp(-float(t1) / tau))
 
 		if tau < 0:
 			raise InputDataException("Result is numerically instable, tau was negative.")
