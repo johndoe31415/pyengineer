@@ -81,8 +81,7 @@ class Plugin(BasePlugin):
 			"options" : options[ : 15],
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "r": "12345", "r_set": "E12" })

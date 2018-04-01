@@ -98,8 +98,7 @@ class Plugin(BasePlugin):
 			"l":		UnitValue(value * l).to_dict() if l else None,
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "marking": "4702" })

@@ -147,8 +147,7 @@ class Plugin(BasePlugin):
 			"choices":	choices,
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "v_in": "12", "v_load": "5", "i": "10m", "r_user": "", "r_set": "E12" })

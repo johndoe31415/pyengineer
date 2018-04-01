@@ -110,8 +110,7 @@ class Plugin(BasePlugin):
 			"candidates":		candidates,
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "diameter": "3.05m", "length": "5m", "turns": "8" })

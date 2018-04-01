@@ -89,5 +89,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "f_std": "", "f_user": "8M" })

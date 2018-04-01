@@ -131,5 +131,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "f_std": "", "f_user": "16M", "period": "500u", "bit_width": "8", "prescaler": "" })

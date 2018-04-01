@@ -48,8 +48,7 @@ class Plugin(BasePlugin):
 			"significant_digits":	significant_digits,
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 	plugin.dump_request({ "input_value": "123.456k", "significant_digits": "4" })

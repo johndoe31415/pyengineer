@@ -144,10 +144,9 @@ class Plugin(BasePlugin):
 			"f":			UnitValue(f).to_dict(),
 		}
 
-
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	plugin = Plugin(Configuration("configuration.json"))
+	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
 
 	# tau = 1.234    V0 = 5
 	plugin.dump_request({ "t1": "0.1", "v1": "4.6108", "t2": "0.3", "v2": "3.9209" })
