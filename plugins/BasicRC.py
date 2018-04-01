@@ -114,9 +114,9 @@ class Plugin(BasePlugin):
 			function = _ChargingCapFunction(d = float(v1) / float(v2), t1 = float(t1), t2 = float(t2))
 			try:
 				tau = NewtonSolver(function).solve(x0 = 1)
+				v0 = float(v1) / (1 - math.exp(-float(t1) / tau))
 			except ZeroDivisionError:
 				raise InputDataException("Result is numerically instable, cannot solve.")
-			v0 = float(v1) / (1 - math.exp(-float(t1) / tau))
 
 		if tau < 0:
 			raise InputDataException("Result is numerically instable, tau was negative.")
