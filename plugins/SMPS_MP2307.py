@@ -104,5 +104,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config, instanciated_from = "local").request("calc", { "v_out": "3.3", "r_set": "E12", "v_in": 12, "i_out": "100m", "l": "10u" }))
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "v_out": "3.3", "r_set": "E12", "v_in": 12, "i_out": "100m", "l": "10u" })

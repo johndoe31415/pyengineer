@@ -104,7 +104,7 @@ class Plugin(BasePlugin):
 		abs_error = UnitValue(actual_v_load - v_load)
 		return {
 			"name":			name,
-			"r":			r.to_dict(),
+			"r":			UnitValue(r).to_dict(),
 			"v_load":		UnitValue(actual_v_load).to_dict(),
 			"rel_error":	rel_error,
 			"abs_error":	abs_error.to_dict(),
@@ -150,5 +150,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "v_in": "12", "v_load": "5", "i": "10m", "r_user": "", "r_set": "E12" }))
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "v_in": "12", "v_load": "5", "i": "10m", "r_user": "", "r_set": "E12" })

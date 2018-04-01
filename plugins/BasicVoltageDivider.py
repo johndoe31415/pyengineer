@@ -94,6 +94,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "v_in": "12", "v_out": "3.3", "r_sum": "10k", "r_set": "E12", "r_tolerance": "35" }))
-
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "v_in": "12", "v_out": "3.3", "r_sum": "10k", "r_set": "E12", "r_tolerance": "35" })

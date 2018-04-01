@@ -37,7 +37,7 @@ ${result_table_begin("Parameter", "Symbol", "Value")}
 	<td>Diameter:</td>
 	<td>d = </td>
 	<td>${d["diameter"]["fmt"]}m<br />
-		${"%.3f" % (d["diameter_inch"]["flt"])}" ≈ ${d["diameter_frac"].html}" (${"%+.1f%%" % (100 * d["diameter_frac"].absolute_error)})
+		${"%.3f" % (d["diameter_inch"]["flt"])}" ≈ ${d["diameter_frac"]["html"]}" (${"%+.1f%%" % (100 * d["diameter_frac"]["abs_error"])})
 	</td>
 </tr>
 <tr>
@@ -57,7 +57,7 @@ ${result_table_begin("Class", "Name", "Diameter", "Pitch", "Error", "Usage")}
 	<td>${candidate["name"]}</td>
 	<td>
 		${candidate["diameter"]["fmt"]}m<br />
-		${candidate["diameter_frac"].html + '"' if not candidate["diameter_frac"].is_zero else ""}
+		${candidate["diameter_frac"]["html"] + '"' if not candidate["diameter_frac"]["is_zero"] else ""}
 	</td>
 	<td>
 		${candidate["pitch"]["fmt"]}m/turn<br />
@@ -94,7 +94,7 @@ class Plugin(BasePlugin):
 			"name":				candidate.name,
 			"usage":			candidate.usage,
 			"diameter":			UnitValue(candidate.diameter).to_dict(),
-			"diameter_frac":	FractionalRepresentation(candidate.diameter * 10000 / 254, max_abs_fractional_error = 0.01),
+			"diameter_frac":	FractionalRepresentation(candidate.diameter * 10000 / 254, max_abs_fractional_error = 0.01).to_dict(),
 			"pitch":			UnitValue(candidate.pitch).to_dict(),
 			"pitch_tpi":		candidate.pitch_tpi,
 			"diameter_err":		(candidate.diameter - float(diameter)) / float(diameter),
@@ -104,7 +104,7 @@ class Plugin(BasePlugin):
 		return {
 			"diameter":			diameter.to_dict(),
 			"diameter_inch":	diameter_inch.to_dict(),
-			"diameter_frac":	FractionalRepresentation(diameter_inch.exact_value, max_abs_fractional_error = 0.01),
+			"diameter_frac":	FractionalRepresentation(diameter_inch.exact_value, max_abs_fractional_error = 0.01).to_dict(),
 			"pitch":			UnitValue(pitch).to_dict(),
 			"pitch_tpi":		0.0254 / pitch,
 			"candidates":		candidates,
@@ -113,5 +113,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "diameter": "3.05m", "length": "5m", "turns": "8" }))
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "diameter": "3.05m", "length": "5m", "turns": "8" })
