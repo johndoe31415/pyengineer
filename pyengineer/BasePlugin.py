@@ -31,7 +31,7 @@ class BasePlugin(object):
 	__FORM_TEMPLATE_PREFIX = "<%namespace file=\"plugin_form_lib.html\" import=\"*\" />\n"
 	__RESPONSE_TEMPLATE_PREFIX = "<%namespace file=\"plugin_response_lib.html\" import=\"*\" />\n<%inherit file=\"plugin_response_base.html\" />\n"
 
-	def __init__(self, configuration, instanciated_from):
+	def __init__(self, configuration, instanciated_from = None):
 		assert(isinstance(self._ID, str))
 		assert(isinstance(self._TITLE, str))
 		assert(isinstance(self._MENU_HIERARCHY, tuple))
