@@ -21,6 +21,7 @@
 
 import math
 from pyengineer import BasePlugin, UnitValue, InputDataException
+from pyengineer.NewtonSolver import DiffedFunction, NewtonSolver
 
 _form_template = """
 <form id="input_data">
@@ -53,8 +54,31 @@ ${result_table_begin("Parameter", "Symbol", "Value")}
 	<td>${d["f"]["fmt"]}Hz</td>
 </tr>
 
+<tr>
+	<td>Absolute error:</td>
+	<td>f = </td>
+	<td>${d["abs_error"]["fmt"]}V</td>
+</tr>
+
 ${result_table_end()}
 """
+
+class _ChargingCapFunction(DiffedFunction):
+	"""f(tau) = d - (1 - math.exp(-t1 / tau)) / (1 - math.exp(-t2 / tau))"""
+
+	def __init__(self, d, t1, t2):
+		self._d = d
+		self._t1 = t1
+		self._t2 = t2
+
+	def f(self, tau):
+		(d, t1, t2) = (self._d, self._t1, self._t2)
+		return d - (1 - math.exp(-t1 / tau)) / (1 - math.exp(-t2 / tau))
+
+	def fdiff(self, tau):
+		(d, t1, t2) = (self._d, self._t1, self._t2)
+		return t2 * (math.exp(-t1 / tau) - 1) * math.exp(-t2 / tau) / ((tau ** 2) * (math.exp(-t2 / tau) - 1) ** 2) \
+					- t1 * math.exp(-t1 / tau) / ((tau ** 2) * (math.exp(-t2 / tau) - 1))
 
 class Plugin(BasePlugin):
 	_ID = "1fc081a2-b445-4880-b4a0-db8bfe8e0205"
@@ -71,22 +95,62 @@ class Plugin(BasePlugin):
 		if t1 > t2:
 			(t1, v1, t2, v2) = (t2, v2, t1, v1)
 
-		if v2 > v1:
-			# Capacitor is charging
-			raise InputDataException("Solving charging capacitors is not supported.")
+		if v2 < v1:
+			# Capacitor is discharging
+			# v(t) = v0 * exp(-t / tau)
+			# v1 = v0 * exp(-t1 / tau)  ->  v0 = v1 / exp(-t1 / tau)
+			# v2 = v0 * exp(-t2 / tau)  ->  v0 = v2 / exp(-t2 / tau)
+			# v1 / exp(-t1 / tau) = v2 / exp(-t2 / tau)
+			# v1 / v2 = exp(-t1 / tau) / exp(-t2 / tau) = exp((-t1 - (-t2)) / tau) = exp((t2 - t1) / tau)
+			# (t2 - t1) / tau = ln(v1 / v2)
+			# tau = (t2 - t1) / ln(v1 / v2)
+			tau = (float(t2) - float(t1)) / math.log(float(v1) / float(v2))
+		else:
+			# Capacitor is charging, here we need to rely on numeric solution.
+			# v(t) = v0 * (1 - exp(-t / tau))
+			# v1 = v0 * exp(-t1 / tau)
+			# v2 = v0 * exp(-t2 / tau)
+			# v1 / v2 = exp(-t1 / tau) / exp(-t2 / tau)
+			# Substitute: d = v1 / v2
+			# d = exp(-t1 / tau) / exp(-t2 / tau)
+			# d - exp(-t1 / tau) / exp(-t2 / tau) = 0
+			# Solve this by Newton's method.
+			d = float(v1) / float(v2)
+			function = _ChargingCapFunction(d = float(v1) / float(v2), t1 = float(t1), t2 = float(t2))
+			try:
+				tau = NewtonSolver(function).solve(x0 = 1)
+			except ZeroDivisionError:
+				raise InputDataException("Result is numerically instable, cannot solve.")
 
-		# Capacitor is discharging
-		# V = V0 * exp(-t / tau)
-		# i.e., v1 = V0 * exp(-t1 / tau)     and     v1 = V0 * exp(-t1 / tau)
-		# V0 = v1 / exp(-t1 / tau)
-		tau = (float(t1) - float(t2)) / math.log(float(v2) / float(v1))
+		# In either case:
+		# v0 = v1 / exp(-t1 / tau)
 		v0 = float(v1) / math.exp(-float(t1) / tau)
+
+		if tau < 0:
+			raise InputDataException("Result is numerically instable, tau was negative.")
+
+		# Now, plausibilize values.
+		if v2 < v1:
+			calc_v1 = v0 * math.exp(-float(t1) / tau)
+			calc_v2 = v0 * math.exp(-float(t2) / tau)
+		else:
+			calc_v1 = v0 * (1 - math.exp(-float(t1) / tau))
+			calc_v2 = v0 * (1 - math.exp(-float(t2) / tau))
+
+		error_v1 = abs(calc_v1 - float(v1))
+		error_v2 = abs(calc_v2 - float(v2))
+		max_error = max(error_v1, error_v2)
+		if (max_error > 10):
+			raise InputDataException("Result is numerically instable and diverged. Refusing to give a completely wrong answer. Absolute error was %.2e" % (max_error))
+
+		# Cutoff frequency
 		f = 1 / (2 * math.pi * tau)
 
 		return {
-			"tau":	tau,
-			"v0":	UnitValue(v0).to_dict(),
-			"f":	UnitValue(f).to_dict(),
+			"tau":			tau,
+			"v0":			UnitValue(v0).to_dict(),
+			"f":			UnitValue(f).to_dict(),
+			"abs_error":	UnitValue(max_error).to_dict(),
 		}
 
 
