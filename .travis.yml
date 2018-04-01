@@ -7,3 +7,4 @@ before_install:
 
 script: 
     - python3 -m unittest pyengineer.tests
+    - ./run_plugins
