@@ -54,12 +54,6 @@ ${result_table_begin("Parameter", "Symbol", "Value")}
 	<td>${d["f"]["fmt"]}Hz</td>
 </tr>
 
-<tr>
-	<td>Absolute error:</td>
-	<td>f = </td>
-	<td>${d["abs_error"]["fmt"]}V</td>
-</tr>
-
 ${result_table_end()}
 """
 
@@ -138,7 +132,7 @@ class Plugin(BasePlugin):
 		error_v1 = abs(calc_v1 - float(v1))
 		error_v2 = abs(calc_v2 - float(v2))
 		max_error = max(error_v1, error_v2)
-		if (max_error > 10):
+		if (max_error > 1e-3):
 			raise InputDataException("Result is numerically instable and diverged. Refusing to give a completely wrong answer. Absolute error was %.2e" % (max_error))
 
 		# Cutoff frequency
@@ -148,7 +142,6 @@ class Plugin(BasePlugin):
 			"tau":			tau,
 			"v0":			UnitValue(v0).to_dict(),
 			"f":			UnitValue(f).to_dict(),
-			"abs_error":	UnitValue(max_error).to_dict(),
 		}
 
 
