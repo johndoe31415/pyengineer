@@ -19,10 +19,29 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .MenuTests import MenuTests
-from .UnitValueTests import UnitValueTests
-from .ESeriesTests import ESeriesTests
-from .ThreadsTests import ThreadsTests
-from .ValueSetTests import ValueSetTests
-from .FractionalRepresentationTests import FractionalRepresentationTests
-from .NewtonSolverTests import NewtonSolverTests
+import unittest
+import pkgutil
+import json
+from pyengineer.NewtonSolver import DiffedFunction, NewtonSolver
+
+class _Parabola(DiffedFunction):
+	def __init__(self, a, b, c):
+		self._a = a
+		self._b = b
+		self._c = c
+
+	def f(self, x):
+		(a, b, c) = (self._a, self._b, self._c)
+		return a * (x ** 2) + b * x + c
+
+class NewtonSolverTests(unittest.TestCase):
+	def test_basic(self):
+		parabola = _Parabola(a = 1, b = -1, c = -6)
+		solver = NewtonSolver(parabola)
+		x0 = solver.solve(x0 = -5)
+		self.assertAlmostEqual(x0, -2)
+		self.assertAlmostEqual(parabola.f(x0), 0)
+
+		x1 = solver.solve(x0 = 1.234567)
+		self.assertAlmostEqual(x1, 3)
+		self.assertAlmostEqual(parabola.f(x1), 0)
