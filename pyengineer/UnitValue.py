@@ -122,7 +122,7 @@ class UnitValue(object):
 		}
 		if include_raw:
 			result["raw"] = self.raw_value
-		if include_fractional:
+		if include_repr:
 			result["repr"] = self.representation
 		if include_fractional:
 			result["fractional"] = self.get_fractional()
