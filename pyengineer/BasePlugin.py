@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import json
 import uuid
 from pyengineer import LocalTemplateLookup
 
@@ -100,6 +101,14 @@ class BasePlugin(object):
 				"d":	response.get("data"),
 			}
 			return self._response_template.render(**variables)
+
+	def dump_request(self, parameters, endpoint = "default"):
+		print("Request <%s>:" % (endpoint))
+		print(json.dumps(parameters, sort_keys = True, indent = 4))
+		response = self.request(endpoint, parameters)
+		print("Response:")
+		print(json.dumps(response, sort_keys = True, indent = 4))
+		print()
 
 	def __str__(self):
 		return "Plugin<%s / %s from %s>" % (self.plugin_title, self.plugin_id, self.instanciated_from)

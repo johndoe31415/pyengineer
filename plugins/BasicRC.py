@@ -147,7 +147,8 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
+	plugin = Plugin(Configuration("configuration.json"))
+
 	# tau = 1.234    V0 = 5
-	print(Plugin(config).request("calc", { "t1": "0.1", "v1": "4.6108", "t2": "0.3", "v2": "3.9209" }))
-	print(Plugin(config).request("calc", { "t1": "0.1", "v1": "0.3892", "t2": "0.3", "v2": "1.0791" }))
+	plugin.dump_request({ "t1": "0.1", "v1": "4.6108", "t2": "0.3", "v2": "3.9209" })
+	plugin.dump_request({ "t1": "0.1", "v1": "0.3892", "t2": "0.3", "v2": "1.0791" })
