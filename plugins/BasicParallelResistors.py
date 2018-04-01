@@ -69,8 +69,8 @@ class Plugin(BasePlugin):
 				if abs(error) > 0.75:
 					continue
 				option = {
-					"r1":		r1.to_dict(),
-					"r2":		r2.to_dict(),
+					"r1":		UnitValue(r1, repr_callback = lambda v: v.format()).to_dict(),
+					"r2":		UnitValue(r2, repr_callback = lambda v: v.format()).to_dict(),
 					"r":		UnitValue(r_total, repr_callback = lambda v: v.format(significant_digits = 4)).to_dict(),
 					"error":	error,
 					"ratio":	float(r2) / float(r1),
@@ -84,5 +84,5 @@ class Plugin(BasePlugin):
 
 if __name__ == "__main__":
 	from pyengineer import Configuration
-	config = Configuration("configuration.json")
-	print(Plugin(config).request("calc", { "r": "12345", "r_set": "E12" }))
+	plugin = Plugin(Configuration("configuration.json"))
+	plugin.dump_request({ "r": "12345", "r_set": "E12" })
