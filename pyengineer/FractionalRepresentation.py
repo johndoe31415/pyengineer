@@ -100,5 +100,18 @@ class FractionalRepresentation(object):
 	def html(self):
 		return self.to_string(fractional_formatter = lambda n, d: "<sup>%d</sup>/<sub>%d</sub>" % (n, d))
 
+	def to_dict(self):
+		return {
+			"negative":		self.negative,
+			"whole":		self.whole,
+			"numerator":	self.numerator,
+			"denominator":	self.denominator,
+			"frac_error":	self.fractional_error,
+			"abs_error":	self.absolute_error,
+			"text":			str(self),
+			"html":			self.html,
+			"is_zero":		self.is_zero,
+		}
+
 	def __str__(self):
 		return self.to_string()
