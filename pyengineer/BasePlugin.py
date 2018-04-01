@@ -109,6 +109,11 @@ class BasePlugin(object):
 		print("Response:")
 		try:
 			print(json.dumps(response, sort_keys = True, indent = 4))
+			template_input = {
+				"status":	"ok",
+				"data":		response,
+			}
+			print(self.render_response(template_input))
 		except TypeError as e:
 			print("Error during serialization: %s" % (str(e)))
 			print(response)

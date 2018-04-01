@@ -69,9 +69,9 @@ class Plugin(BasePlugin):
 				if abs(error) > 0.75:
 					continue
 				option = {
-					"r1":		UnitValue(r1, repr_callback = lambda v: v.format()).to_dict(),
-					"r2":		UnitValue(r2, repr_callback = lambda v: v.format()).to_dict(),
-					"r":		UnitValue(r_total, repr_callback = lambda v: v.format(significant_digits = 4)).to_dict(),
+					"r1":		UnitValue(r1).to_dict(),
+					"r2":		UnitValue(r2).to_dict(),
+					"r":		UnitValue(r_total, repr_callback = lambda v: v.format(significant_digits = 4)).to_dict(include_repr = True),
 					"error":	error,
 					"ratio":	float(r2) / float(r1),
 				}

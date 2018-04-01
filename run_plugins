@@ -1,0 +1,9 @@
+#!/bin/bash -e
+#
+#
+
+for plugin in plugins/*.py; do
+	echo "$plugin"
+	python3 "$plugin"
+done
+echo "All plugins ran successfully."

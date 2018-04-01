@@ -76,11 +76,11 @@ class Plugin(BasePlugin):
 				ideal_freq *= 8
 
 			result_items.append({
-				"baudrate":		baudrate.to_dict(),
+				"baudrate":		baudrate.to_dict(include_repr = True),
 				"act_baudrate":	act_baudrate,
 				"ubrr":			ubrr,
 				"error":		error,
-				"ideal_freq":	UnitValue(ideal_freq, repr_callback = lambda value: value.format(significant_digits = 6)).to_dict(),
+				"ideal_freq":	UnitValue(ideal_freq, repr_callback = lambda value: value.format(significant_digits = 6)).to_dict(include_repr = True),
 			})
 
 		return {
