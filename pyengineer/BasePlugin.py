@@ -107,7 +107,11 @@ class BasePlugin(object):
 		print(json.dumps(parameters, sort_keys = True, indent = 4))
 		response = self.request(endpoint, parameters)
 		print("Response:")
-		print(json.dumps(response, sort_keys = True, indent = 4))
+		try:
+			print(json.dumps(response, sort_keys = True, indent = 4))
+		except TypeError as e:
+			print("Error during serialization: %s" % (str(e)))
+			print(response)
 		print()
 
 	def __str__(self):
