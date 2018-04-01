@@ -43,8 +43,28 @@ that you create) and the placement inside the menu (`_MENU_HIERARCHY`). Then
 you're ready to go.  pyengineer will auto-discover that new Python file in the
 plugins/ directory, integrate it into the menu and show it to you.  You can
 also run it without and UI from the command line. This is useful for testing
-and all present plugins can do this. Just make sure you symlink the pyengineer/
-subdirectory inside the plugins/ subdirectory or install pyengineer globally.
+and all present plugins can do this:
+
+```
+$ python3 plugins/BasicDeunify.py
+Request <default>:
+{
+    "input_value": "123.456k",
+    "significant_digits": "4"
+}
+Response:
+{
+    "significant_digits": 4,
+    "value": {
+        "flt": 123456.0,
+        "fmt": "123.5 k"
+    }
+}
+
+
+
+123456.000 = 1.23e+05 = <strong>123.5 k</strong>
+```
 
 ## Dependencies
 pyengineer depends on Python3, Mako and Flask.
