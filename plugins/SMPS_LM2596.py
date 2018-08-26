@@ -66,7 +66,7 @@ class Plugin(BasePlugin):
 		# r1 * ((vout / vref) - 1) = r2
 
 		options = [ ]
-		for r1 in r_set.iter_range(500, 50000):
+		for r1 in r_set.iter_range(240, 1500):
 			ideal_r2 = float(r1) * ((float(v_out) / v_ref) - 1)
 			for r2 in r_set.iter_closest(ideal_r2):
 				actual_v_out = v_ref * (1 + (float(r2) / float(r1)))
