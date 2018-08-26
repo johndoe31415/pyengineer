@@ -86,20 +86,20 @@ class Plugin(BasePlugin):
 	_RESPONSE_TEMPLATE = _response_template
 
 	def request(self, endpoint, parameters):
-		r1 = float(UnitValue(parameters["r1"]))
-		r2 = float(UnitValue(parameters["r2"]))
-		c1 = float(UnitValue(parameters["c1"]))
+		r1 = UnitValue(parameters["r1"])
+		r2 = UnitValue(parameters["r2"])
+		c1 = UnitValue(parameters["c1"])
 
-		t_on = 0.693 * (r1 + r2) * c1
-		t_off = 0.693 * r2 * c1
+		t_on = 0.693 * (float(r1) + float(r2)) * float(c1)
+		t_off = 0.693 * float(r2) * float(c1)
 		t = t_on + t_off
 		f = 1 / t
 		duty = t_on / t
 
 		return {
-			"r1":			UnitValue(r1).to_dict(),
-			"r2":			UnitValue(r2).to_dict(),
-			"c1":			UnitValue(c1).to_dict(),
+			"r1":			r1.to_dict(),
+			"r2":			r2.to_dict(),
+			"c1":			c1.to_dict(),
 			"t":			UnitValue(t).to_dict(),
 			"t_on":			UnitValue(t_on).to_dict(),
 			"t_off":		UnitValue(t_off).to_dict(),
