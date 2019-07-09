@@ -135,4 +135,4 @@ class Plugin(BasePlugin):
 if __name__ == "__main__":
 	from pyengineer import Configuration
 	plugin = Plugin(Configuration("configuration.json"), instanciated_from = __file__)
-	plugin.dump_request({ "v_out": "3.3", "r_set": "E12" })
+	plugin.dump_request({ "v_out": "3.3", "r_set": "E12", "part": "lm2596-full", "r_tolerance": "5" })
