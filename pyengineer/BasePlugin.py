@@ -113,7 +113,11 @@ class BasePlugin(object):
 				"status":	"ok",
 				"data":		response,
 			}
-			print(self.render_response(template_input))
+			try:
+				print(self.render_response(template_input))
+			except TypeError as e:
+				print("Error during rendering: %s" % (str(e)))
+				print(template_input)
 		except TypeError as e:
 			print("Error during serialization: %s" % (str(e)))
 			print(response)

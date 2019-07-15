@@ -19,11 +19,28 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .MenuTests import MenuTests
-from .UnitValueTests import UnitValueTests
-from .ESeriesTests import ESeriesTests
-from .ThreadsTests import ThreadsTests
-from .ValueSetTests import ValueSetTests
-from .FractionalRepresentationTests import FractionalRepresentationTests
-from .NewtonSolverTests import NewtonSolverTests
-from .SortedListTests import SortedListTests
+import bisect
+
+class SortedList(object):
+	def __init__(self, values):
+		self._values = list(sorted(set(values)))
+
+	def less_more(self, search_value):
+		if len(self._values) == 0:
+			return (None, None)
+
+		index = bisect.bisect(self._values, search_value)
+
+		if index >= len(self._values):
+			less_value = self._values[index - 1]
+			more_value = None
+		elif (index == 0) and (self._values[index] > search_value):
+			less_value = None
+			more_value = self._values[0]
+		else:
+			less_value = self._values[index - 1]
+			more_value = self._values[index]
+		return (less_value, more_value)
+
+	def less_more_list(self, search_value):
+		return [ value for value in self.less_more(search_value) if value is not None ]
