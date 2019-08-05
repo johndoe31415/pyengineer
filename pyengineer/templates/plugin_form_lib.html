@@ -5,9 +5,13 @@
 			<input type="text" class="form-control" id="${field_name}" name="${field_name}" value="${default_value}">
 		</div>
 		%if righthand_side is not None:
+		%if isinstance(righthand_side, str):
 		<div class="col-1 col-form-label">
 			${righthand_side}
 		</div>
+		%else:
+		${input_customset(field_name + "_unit", "", righthand_side, optional = False)}
+		%endif
 		%endif
 	</div>
 </%def>

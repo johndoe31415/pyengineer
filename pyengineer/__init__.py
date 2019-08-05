@@ -22,6 +22,7 @@
 from .FractionalRepresentation import FractionalRepresentation
 from .OrderedSet import OrderedSet
 from .UnitValue import UnitValue
+from .UnitConversion import UnitConversion
 from .ESeries import ESeries
 from .Threads import Thread, ThreadDB
 from .Exceptions import GeneralException, InputDataException

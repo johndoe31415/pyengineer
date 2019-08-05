@@ -21,6 +21,7 @@
 
 from .MenuTests import MenuTests
 from .UnitValueTests import UnitValueTests
+from .UnitConversionTests import UnitConversionTests
 from .ESeriesTests import ESeriesTests
 from .ThreadsTests import ThreadsTests
 from .ValueSetTests import ValueSetTests

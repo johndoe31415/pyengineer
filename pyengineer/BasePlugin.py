@@ -122,6 +122,7 @@ class BasePlugin(object):
 			print("Error during serialization: %s" % (str(e)))
 			print(response)
 		print()
+		return response
 
 	def __str__(self):
 		return "Plugin<%s / %s from %s>" % (self.plugin_title, self.plugin_id, self.instanciated_from)
