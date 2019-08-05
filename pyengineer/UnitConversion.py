@@ -81,3 +81,8 @@ class UnitConversion(object):
 		xvalue = (value - from_offset) / from_scalar
 		result = (xvalue * to_scalar) + to_offset
 		return result
+
+	def convert_delta(self, value, from_unit, to_unit):
+		(from_scalar, from_offset) = self._get_conversion(from_unit)
+		(to_scalar, to_offset) = self._get_conversion(to_unit)
+		return value / from_scalar * to_scalar

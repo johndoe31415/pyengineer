@@ -126,3 +126,11 @@ class UnitConversionTests(unittest.TestCase):
 
 		self.assertAlmostEqual(uc.convert(154, "*2+100", "*10+5"), 275)
 		self.assertAlmostEqual(uc.convert(275, "*10+5", "*2+100"), 154)
+
+	def test_convert_delta(self):
+		uc = UnitConversion.temperatures()
+		self.assertAlmostEqual(uc.convert_delta(123, "K", "C"), 123)
+		self.assertAlmostEqual(uc.convert_delta(123, "C", "K"), 123)
+		self.assertAlmostEqual(uc.convert_delta(100, "F", "C"), 55.5555, places = 3)
+		self.assertAlmostEqual(uc.convert_delta(100, "F", "K"), 55.5555, places = 3)
+		self.assertAlmostEqual(uc.convert_delta(100, "C", "F"), 180)

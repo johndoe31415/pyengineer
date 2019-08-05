@@ -10,7 +10,13 @@
 			${righthand_side}
 		</div>
 		%else:
-		${input_customset(field_name + "_unit", "", righthand_side, optional = False)}
+		<div class="col-2">
+			<select id="${field_name}_unit" name="${field_name}_unit" class="form-control">
+				%for (key, text) in righthand_side:
+				<option value="${key}">${text}</option>
+				%endfor
+			</select>
+		</div>
 		%endif
 		%endif
 	</div>
