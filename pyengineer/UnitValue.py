@@ -38,6 +38,10 @@ class UnitValue(object):
 		("T",	12),
 		("E",	15),
 	)
+	_ADDITIONAL_DECODE_PREFIXES = (
+		("c",	-2),
+		("d",	-1),
+	)
 
 	def __init__(self, value, repr_callback = None):
 		self._repr_callback = repr_callback
@@ -51,7 +55,7 @@ class UnitValue(object):
 			exponent = 0
 			if isinstance(value, str):
 				value = value.rstrip("\t\n ")
-				for (si_prefix, si_exponent) in self._SI_PREFIXES:
+				for (si_prefix, si_exponent) in self._SI_PREFIXES + self._ADDITIONAL_DECODE_PREFIXES:
 					if value.endswith(si_prefix):
 						exponent = si_exponent
 						value = value[:-len(si_prefix)]

@@ -26,10 +26,11 @@ from pyengineer.NewtonSolver import DiffedFunction, NewtonSolver
 _form_template = """
 <form id="input_data">
 	${input_text("i", "Current rating", righthand_side = "A")}
-	${input_text("thickness", "Copper thickness", default_value = "1", righthand_side = [ ("oz", "oz/in²"), ("mil", "mil"), ("mm", "mm") ])}
+	${input_text("thickness", "Copper thickness", default_value = "1", righthand_side = [ ("oz", "oz/ft²"), ("mil", "mil"), ("mm", "mm") ])}
 	${input_text("tempdelta", "Temperature delta", righthand_side = [ ("C", "°C"), ("F", "°F") ])}
 	${input_text("trace_width", "Trace width", righthand_side = [ ("mil", "mil"), ("mm", "mm") ])}
 	${input_checkbox("inner_layer", "Inner layer")}
+	${input_text("trace_length", "Trace length", righthand_side = "m")}
 	${submit_button("Calculate")}
 </form>
 """
@@ -47,7 +48,22 @@ t = ${"%.1f" % (variables["t"]["kelvin"])} °C<br />
 w = ${"%.1f" % (variables["width"]["mil"])} mil<br />
 %endif
 %if "A" in variables:
-A = ${"%.1f" % (variables["A"]["sqrmil"])} mil<sup>2</sup><br />
+A = ${"%.1f" % (variables["A"]["sqrmil"])} mil<sup>2</sup> ≙  ${"%.4f" % (variables["A"]["mm2"])} mm<sup>2</sup><br />
+%endif
+%if "thickness" in variables:
+h = ${"%.1f" % (variables["thickness"]["mil"])} mil ≙ ${"%.0f" % (1000 * variables["thickness"]["mm"])}µm ≙ ${"%.1f" % (variables["thickness"]["oz"])} oz/ft<sup>2</sup><br />
+%endif
+%if "R_per_cm" in variables:
+R<sub>dyn</sub> = ${variables["R_per_cm"]["fmt"]}Ω/cm<br />
+%endif
+%if "l" in variables:
+l = ${variables["l"]["fmt"]}m<br />
+%endif
+%if "R" in variables:
+R = ${variables["R"]["fmt"]}Ω<br />
+%endif
+%if "P" in variables:
+P = ${variables["P"]["fmt"]}W<br />
 %endif
 </%def>
 
@@ -102,6 +118,10 @@ class Plugin(BasePlugin):
 		else:
 			trace_width_mil = None
 		inner_layer = (int(parameters.get("inner_layer", "0")) == 1)
+		if parameters.get("trace_length", "") != "":
+			trace_length = UnitValue(parameters["trace_length"])
+		else:
+			trace_length = None
 		k = 0.024 if inner_layer else 0.048
 
 
@@ -112,6 +132,32 @@ class Plugin(BasePlugin):
 		# A = Cross section in mil²
 		# T = Temperature delta in °C
 		# A = (I / k / T^0.44)^(1 / 0.725)
+		# T = (I / k / A^0.725)^ (1 / 0.44)
+
+		def unit_temperature(tempdelta_kelvin):
+			return {
+				"kelvin":	tempdelta_kelvin,
+			}
+
+		def unit_length_mil(length_mil):
+			return {
+				"mil":		length_mil,
+			}
+
+		def unit_area_sqrmil(area_sqrmil):
+			return {
+				"sqrmil":	area_sqrmil,
+				"mm2":		area_sqrmil / ((1000 / 25.4) ** 2),
+			}
+
+		def unit_copper_thickness(length_mil):
+			uc = UnitConversion.lengths()
+			uc.add(1, "oz", 35, "um")
+			return {
+				"mil":		length_mil,
+				"oz":		uc.convert(length_mil, "mil", "oz"),
+				"mm":		uc.convert(length_mil, "mil", "mm"),
+			}
 
 
 		results = [ ]
@@ -122,17 +168,12 @@ class Plugin(BasePlugin):
 			result = {
 				"given": {
 					"i":			i.to_dict(),
-					"t": {
-						"kelvin":	t,
-					},
+					"t":			unit_temperature(t),
+					"thickness":	unit_copper_thickness(thickness_mil),
 				},
 				"calculated": {
-					"A": {
-						"sqrmil":		calc_A_sqrmil,
-					},
-					"width": {
-						"mil":		calc_trace_width_mil,
-					},
+					"A":			unit_area_sqrmil(calc_A_sqrmil),
+					"width":		unit_length_mil(calc_trace_width_mil),
 				},
 			}
 			results.append(result)
@@ -144,23 +185,67 @@ class Plugin(BasePlugin):
 
 			result = {
 				"given": {
-					"t": {
-						"kelvin":	t,
-					},
-					"A": {
-						"sqrmil":		calc_A_sqrmil,
-					},
-					"width": {
-						"mil":		trace_width_mil,
-					},
+					"width":		unit_length_mil(calc_trace_width_mil),
+					"t":			unit_temperature(t),
+					"thickness":	unit_copper_thickness(thickness_mil),
 				},
 				"calculated": {
+					"A":			unit_area_sqrmil(calc_A_sqrmil),
 					"i":			calc_i.to_dict(),
 				},
 			}
 			results.append(result)
 
+		if (trace_width_mil is not None) and (t is not None) and (i is not None):
+			# Calculate copper thickness
+			calc_A_sqrmil = (float(i) / k / (t ** 0.44)) ** (1 / 0.725)
+			calc_copper_height_mil = calc_A_sqrmil / trace_width_mil
 
+			result = {
+				"given": {
+					"i":			i.to_dict(),
+					"t":			unit_temperature(t),
+					"width":		unit_length_mil(trace_width_mil),
+				},
+				"calculated": {
+					"A":			unit_area_sqrmil(calc_A_sqrmil),
+					"thickness":	unit_copper_thickness(calc_copper_height_mil),
+				},
+			}
+			results.append(result)
+
+		if (trace_width_mil is not None) and (i is not None) and (thickness_mil is not None):
+			# Calculate temperature rise
+			calc_A_sqrmil = trace_width_mil * thickness_mil
+			calc_t = (float(i) / k / (calc_A_sqrmil ** 0.725)) ** (1 / 0.44)
+
+			result = {
+				"given": {
+					"i":			i.to_dict(),
+					"width":		unit_length_mil(trace_width_mil),
+					"thickness":	unit_copper_thickness(thickness_mil),
+				},
+				"calculated": {
+					"A":			unit_area_sqrmil(calc_A_sqrmil),
+					"t":			unit_temperature(calc_t),
+				},
+			}
+			results.append(result)
+
+		for result in results:
+			cu_resistivity = 1.68e-8	# Ohm-meters
+			area_sqrm = result["calculated"]["A"]["mm2"] / 1e6
+			resistance_per_meter = cu_resistivity / area_sqrm
+			result["calculated"]["R_per_cm"] = UnitValue(resistance_per_meter / 100).to_dict()
+			if trace_length is not None:
+				result["given"]["l"] = trace_length.to_dict()
+				result["calculated"]["R"] = UnitValue(resistance_per_meter * float(trace_length)).to_dict()
+				if ("i" in result["given"]):
+					i = result["given"]["i"]["flt"]
+				else:
+					i = result["calculated"]["i"]["flt"]
+				P = (i ** 2) * result["calculated"]["R"]["flt"]
+				result["calculated"]["P"] = UnitValue(P).to_dict()
 
 		return results
 
