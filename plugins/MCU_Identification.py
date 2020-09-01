@@ -1,5 +1,5 @@
 #	pyengineer - Helping hand for electronics and mechanical engineering
-#	Copyright (C) 2012-2018 Johannes Bauer
+#	Copyright (C) 2012-2020 Johannes Bauer
 #
 #	This file is part of pyengineer.
 #
@@ -65,29 +65,30 @@ class Plugin(BasePlugin):
 
 		def _match_stm32(self, match):
 			self._properties.append(("Vendor", "ST Microelectronics"))
-			if match["main"] == "030":
+			if match["main"][0] == "0":
 				self._properties.append(("Core", "ARM Cortex-M0"))
-				self._properties.append(("Line", "Value Line"))
-			elif match["main"] == "101":
+			elif match["main"][0] == "1":
 				self._properties.append(("Core", "ARM Cortex-M3"))
+			elif match["main"][0] == "7":
+				self._properties.append(("Core", "ARM Cortex-M7"))
+
+			if match["main"] == "030":
+				self._properties.append(("Line", "Value Line"))
+			elif match["main"] == "091":
+				self._properties.append(("Line", "N/A"))
+			elif match["main"] == "101":
 				self._properties.append(("Line", "Access Line"))
 			elif match["main"] == "102":
-				self._properties.append(("Core", "ARM Cortex-M3"))
 				self._properties.append(("Line", "USB Access Line, USB 2.0 full-speed interface"))
 			elif match["main"] == "103":
-				self._properties.append(("Core", "ARM Cortex-M3"))
 				self._properties.append(("Line", "Performance Line"))
 			elif match["main"] == "765":
-				self._properties.append(("Core", "ARM Cortex-M7"))
 				self._properties.append(("Line", "USB OTG FS/HS, camera interface, Ethernet"))
 			elif match["main"] == "767":
-				self._properties.append(("Core", "ARM Cortex-M7"))
 				self._properties.append(("Line", "USB OTG FS/HS, camera interface, Ethernet, LCD-TFT"))
 			elif match["main"] == "768":
-				self._properties.append(("Core", "ARM Cortex-M7"))
 				self._properties.append(("Line", "USB OTG FS/HS, camera interface, DSI host, WLCSP with internal regulator OFF"))
 			elif match["main"] == "769":
-				self._properties.append(("Core", "ARM Cortex-M7"))
 				self._properties.append(("Line", "USB OTG FS/HS, camera interface, Ethernet, DSI host"))
 
 			self._properties.append(("Pin Count", {
