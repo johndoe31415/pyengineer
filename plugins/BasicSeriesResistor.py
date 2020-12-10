@@ -1,5 +1,5 @@
 #	pyengineer - Helping hand for electronics and mechanical engineering
-#	Copyright (C) 2012-2018 Johannes Bauer
+#	Copyright (C) 2012-2020 Johannes Bauer
 #
 #	This file is part of pyengineer.
 #
@@ -56,9 +56,19 @@ ${result_table_begin("Parameter", "Symbol", "Value")}
 	<td>${d["r"]["fmt"]}Ω</td>
 </tr>
 <tr>
-	<td>Dissipated power:</td>
-	<td>P = </td>
+	<td>Dissipated power in load:</td>
+	<td>P<sub>load</sub> = </td>
+	<td>${d["p_load"]["fmt"]}W</td>
+</tr>
+<tr>
+	<td>Dissipated power in resistor:</td>
+	<td>P<sub>R</sub> = </td>
 	<td>${d["p_r"]["fmt"]}W</td>
+</tr>
+<tr>
+	<td>Dissipated power total:</td>
+	<td>P<sub>total</sub> = </td>
+	<td>${d["p_total"]["fmt"]}W</td>
 </tr>
 <tr>
 	<td>Efficiency:</td>
@@ -121,6 +131,7 @@ class Plugin(BasePlugin):
 		v_r = float(v_in) - float(v_load)
 		r = v_r / float(i)
 		p_r = float(i) * v_r
+		p_load = float(i) * float(v_load)
 		eta = float(v_load) / float(v_in)
 
 		choices = [ ]
@@ -143,6 +154,8 @@ class Plugin(BasePlugin):
 			"v_r":		UnitValue(v_r).to_dict(),
 			"r":		UnitValue(r).to_dict(),
 			"p_r":		UnitValue(p_r).to_dict(),
+			"p_load":	UnitValue(p_load).to_dict(),
+			"p_total":	UnitValue(p_r + p_load).to_dict(),
 			"eta":		eta,
 			"choices":	choices,
 		}
